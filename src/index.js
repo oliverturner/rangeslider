@@ -1,41 +1,8 @@
 // @flow
 
+import type { Val, Vals, Props, State } from "@oliverturner/rangeslider";
+
 import * as React from "react";
-
-type Val = {
-  key: string,
-  value: number,
-  delta: number,
-  percent: string
-};
-
-type Vals = Array<Val>;
-
-type Props = {
-  min: number,
-  max: number,
-  value: number | Array<number>,
-  step: number,
-  disabled: boolean,
-  vertical: boolean,
-  orderLocked: boolean,
-  minGap: number,
-  rangePushable: boolean,
-  rangeDraggable: boolean,
-  onChange: Function,
-  onBeforeChange: Function,
-  onAfterChange: Function,
-  render: Function
-};
-
-type State = {
-  range: number,
-  values: Vals,
-  rangeStyle: { [key: string]: string },
-  draggedHandleKey: mixed | null,
-  isDraggingRange: boolean,
-  rangeX: number
-};
 
 class Rangeslider extends React.Component<Props, State> {
   static defaultProps: Props;
@@ -45,15 +12,21 @@ class Rangeslider extends React.Component<Props, State> {
   constructor(props: Props) {
     super();
 
-    const values = Array.isArray(props.value) ? props.value : [props.value];
-    const sorted = values.slice().sort((a, b) => a - b);
-
     this.state = {
-      ...this.parseProps(props.min, props.max, sorted),
+      ...this.initProps(props),
       draggedHandleKey: null,
       isDraggingRange: false,
       rangeX: 0
     };
+  }
+
+  componentWillReceiveProps(nextProps: Props) {
+    this.setState(this.initProps(nextProps));
+  }
+
+  initProps(props: Props) {
+    const values = Array.isArray(props.value) ? props.value : [props.value];
+    return this.parseProps(props.min, props.max, values);
   }
 
   getTrackRef = (el: HTMLElement) => {
@@ -64,7 +37,7 @@ class Rangeslider extends React.Component<Props, State> {
     return (v * 100).toFixed(1) + "%";
   }
 
-  topAndTail(arr: Array<any>): [any, any] {
+  topAndTail(arr: Vals): [Val, Val] {
     return [arr[0], arr[arr.length - 1]];
   }
 
@@ -74,9 +47,7 @@ class Rangeslider extends React.Component<Props, State> {
     }
 
     const compareValue = (a, b) => a.value - b.value;
-    const spread: [Val, Val] = this.topAndTail(
-      values.slice().sort(compareValue)
-    );
+    const spread = this.topAndTail(values.slice().sort(compareValue));
 
     const vMin = spread[0];
     const vMax = spread[1];
@@ -100,11 +71,9 @@ class Rangeslider extends React.Component<Props, State> {
       return { key, value, delta, percent };
     });
 
-    return {
-      range,
-      values,
-      rangeStyle: this.getRangeStyle(values)
-    };
+    const rangeStyle = this.getRangeStyle(values);
+
+    return { values, rangeStyle };
   }
 
   updateValues(key: mixed, values: Vals, newValue: number) {
@@ -203,7 +172,12 @@ class Rangeslider extends React.Component<Props, State> {
       onMouseUp: this.onMouseUp
     };
 
-    return this.props.render(this.state, this.getTrackRef, eventListeners);
+    return this.props.render(
+      this.state,
+      this.props,
+      this.getTrackRef,
+      eventListeners
+    );
   }
 }
 
@@ -215,13 +189,23 @@ Rangeslider.defaultProps = {
   vertical: false,
   disabled: false,
   orderLocked: false,
-  minGap: 10,
+  minGap: 0,
   rangeDraggable: true,
   rangePushable: false,
   onChange: () => {},
   onBeforeChange: () => {},
   onAfterChange: () => {},
-  render: (props: Props) => {}
+  render: (
+    state: State,
+    props: Props,
+    getTrackRef: () => {},
+    eventListeners: {
+      onMouseDown: () => {},
+      onMouseMove: () => {},
+      onMouseUp: () => {}
+    }
+  ) => {},
+  children: null
 };
 
 export default Rangeslider;
