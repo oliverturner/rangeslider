@@ -6,10 +6,6 @@ const handleWH = 16;
 const handleBorder = 2;
 const handleOffset = (handleWH - trackH) * -0.5;
 
-export const Demo = styled.div`
-  padding: 50px;
-`;
-
 export const Slider = styled.div`
   -webkit-tap-highlight-color: rgba(0, 0, 0, 0);
 
@@ -17,20 +13,15 @@ export const Slider = styled.div`
 
   box-sizing: border-box;
   position: relative;
-  padding: ${sliderPadding}px 40px;
+  padding: ${sliderPadding}px ${sliderPadding * 2}px;
   
   if(props.disabled) {
-    & ${Handle}, & ${Dot} {
+    & ${Handle} {
       border-color: #ccc;
       box-shadow: none;
       cursor: not-allowed;
     }
-
-    & ${MarkText}, & ${Dot} {
-      cursor: not-allowed !important;
-    }
   }
-
 `;
 
 export const Track = styled.div`
@@ -76,41 +67,4 @@ export const Handle = styled.div`
     box-shadow: 0 0 0 5px #96dbfa;
     outline: none;
   }
-`;
-
-export const Mark = styled.div`
-  position: absolute;
-  top: 18px;
-  left: 0;
-  width: 100%;
-  font-size: 12px;
-`;
-
-export const MarkText = styled.div`
-  position: absolute;
-  display: inline-block;
-  vertical-align: middle;
-  text-align: center;
-  cursor: pointer;
-  color: ${props => (props.active ? "#666" : "#999")};
-`;
-
-export const Step = styled.div`
-  position: absolute;
-  width: 100%;
-  height: ${trackH}px;
-  background: transparent;
-`;
-
-export const Dot = styled.span`
-  position: absolute;
-  bottom: -2px;
-  width: 8px;
-  height: 8px;
-  margin-left: -4px;
-  border: 2px solid ${props => (props.active ? "#96dbfa" : "#999")};
-  border-radius: 50%;
-  cursor: pointer;
-  vertical-align: middle;
-  background-color: #fff;
 `;

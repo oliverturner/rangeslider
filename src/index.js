@@ -2,17 +2,22 @@
 
 import * as React from "react";
 
+type Val = {
+  key: string,
+  value: number,
+  delta: number,
+  percent: string
+};
+
+type Vals = Array<Val>;
+
 type Props = {
   min: number,
   max: number,
   value: number | Array<number>,
-  marks: { number: string },
   step: number,
-  dots: boolean,
-  included: boolean,
   disabled: boolean,
   vertical: boolean,
-  range: Array<number>,
   orderLocked: boolean,
   minGap: number,
   rangePushable: boolean,
@@ -23,40 +28,17 @@ type Props = {
   render: Function
 };
 
-type Val = {
-  key: string,
-  value: number,
-  base: number,
-  delta: number,
-  percent: string
-};
-
-type Vals = Array<Val>;
-
 type State = {
   range: number,
   values: Vals,
   rangeStyle: { [key: string]: string },
-  draggedHandleKey: string | null,
+  draggedHandleKey: mixed | null,
   isDraggingRange: boolean,
   rangeX: number
 };
 
 class Rangeslider extends React.Component<Props, State> {
-  static defaultProps = {
-    value: 0,
-    min: 0,
-    max: 100,
-    step: 1,
-    dots: false,
-    vertical: false,
-    disabled: false,
-    orderLocked: false,
-    minGap: 10,
-    onChange: Function.prototype,
-    onBeforeChange: Function.prototype,
-    onAfterChange: Function.prototype
-  };
+  static defaultProps: Props;
 
   trackEl: ?HTMLElement;
 
@@ -108,15 +90,14 @@ class Rangeslider extends React.Component<Props, State> {
   parseProps(min: number, max: number, rawValues: Array<number>) {
     const range = max - min;
     const values = rawValues.map((value, i) => {
-      let base = value;
-      base = base < max ? base : max;
-      base = base > min ? base : min;
+      value = value > max ? max : value;
+      value = value < min ? min : value;
 
       const key = `handle-${i}`;
-      const delta = (base - min) / range;
+      const delta = (value - min) / range;
       const percent = this.fmtPercent(delta);
 
-      return { key, value, base, delta, percent };
+      return { key, value, delta, percent };
     });
 
     return {
@@ -126,7 +107,7 @@ class Rangeslider extends React.Component<Props, State> {
     };
   }
 
-  updateValues(key: string, values: Vals, newValue: number) {
+  updateValues(key: mixed, values: Vals, newValue: number) {
     const getFreeValues = v => (v.key === key ? newValue : v.value);
 
     const getLockedValues = (v, i) => {
@@ -152,9 +133,9 @@ class Rangeslider extends React.Component<Props, State> {
   //----------------------------------------------------------------------------
   onMouseDown = (e: SyntheticMouseEvent<HTMLElement>) => {
     if (e.target.dataset) {
-      if (e.target.dataset["handle"]) {
-        this.setState({ draggedHandleKey: e.target.dataset["handle"] });
-      } else if (e.target.dataset["range"]) {
+      if (e.target.dataset.handle) {
+        this.setState({ draggedHandleKey: e.target.dataset.handle });
+      } else if (e.target.dataset.range) {
         this.setState({
           isDraggingRange: this.state.values.length > 1,
           rangeX: e.clientX
@@ -222,9 +203,25 @@ class Rangeslider extends React.Component<Props, State> {
       onMouseUp: this.onMouseUp
     };
 
-    // TODO: look into stateReducer pattern
     return this.props.render(this.state, this.getTrackRef, eventListeners);
   }
 }
+
+Rangeslider.defaultProps = {
+  value: 0,
+  min: 0,
+  max: 100,
+  step: 0,
+  vertical: false,
+  disabled: false,
+  orderLocked: false,
+  minGap: 10,
+  rangeDraggable: true,
+  rangePushable: false,
+  onChange: () => {},
+  onBeforeChange: () => {},
+  onAfterChange: () => {},
+  render: (props: Props) => {}
+};
 
 export default Rangeslider;
