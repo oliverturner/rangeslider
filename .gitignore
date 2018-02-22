@@ -1,0 +1,16 @@
+.vscode
+.cache
+.cache-loader
+.serverless
+.webpack
+secrets.*.yml
+*.log
+stats.json
+board.json
+radar.json
+dist/
+
+.DS_Store
+.idea/
+node_modules/
+flow-coverage/
