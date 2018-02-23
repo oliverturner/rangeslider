@@ -10,9 +10,7 @@ declare module "@oliverturner/rangeslider" {
 
   declare type Vals = Array<Val>;
 
-  declare type Props = {|
-    min: number,
-    max: number,
+  declare type SharedProps = {
     value: number | Array<number>,
     render: (
       state: State,
@@ -32,10 +30,23 @@ declare module "@oliverturner/rangeslider" {
     minGap: number,
     rangePushable: boolean,
     rangeDraggable: boolean,
-    onChange: Function,
+    onChange: (values: Vals) => {},
     onBeforeChange: Function,
     onAfterChange: Function
-  |};
+  }
+
+  declare type Props = SharedProps & {
+    min?: number,
+    max?: number,
+    range?: [number, number],
+  };
+
+  declare type DerivedProps = SharedProps & {
+    min: number,
+    max: number,
+    range: [number, number],
+    values: Array<number>
+  };
 
   declare type State = {
     values: Vals,

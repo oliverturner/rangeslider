@@ -1,6 +1,12 @@
 // @flow
 
-import type { Val, Vals, Props, State } from "@oliverturner/rangeslider";
+import type {
+  Val,
+  Vals,
+  DerivedProps,
+  Props,
+  State
+} from "@oliverturner/rangeslider";
 
 import * as React from "react";
 
@@ -8,25 +14,41 @@ class Rangeslider extends React.Component<Props, State> {
   static defaultProps: Props;
 
   trackEl: ?HTMLElement;
+  derivedProps: DerivedProps;
 
   constructor(props: Props) {
     super();
 
+    this.derivedProps = this.initProps(props);
+
     this.state = {
-      ...this.initProps(props),
+      ...this.getValues(this.derivedProps.values),
       draggedHandleKey: null,
       isDraggingRange: false,
       rangeX: 0
     };
   }
 
-  componentWillReceiveProps(nextProps: Props) {
-    this.setState(this.initProps(nextProps));
-  }
+  // componentWillReceiveProps(nextProps: Props) {
+  //   this.derivedProps = this.initProps(nextProps);
+  //   this.setState(this.getValues(this.derivedProps.values));
+  // }
 
-  initProps(props: Props) {
-    const values = Array.isArray(props.value) ? props.value : [props.value];
-    return this.parseProps(props.min, props.max, values);
+  initProps(props: Props): DerivedProps {
+    let { value, min, max, range } = props;
+    const values = Array.isArray(value) ? value : [value];
+
+    if (typeof range === "undefined") {
+      range = [min || 0, max || 0];
+    }
+    if (typeof min === "undefined") {
+      min = range[0];
+    }
+    if (typeof max === "undefined") {
+      max = range[1];
+    }
+
+    return { ...props, values, min, max, range };
   }
 
   getTrackRef = (el: HTMLElement) => {
@@ -48,9 +70,7 @@ class Rangeslider extends React.Component<Props, State> {
 
     const compareValue = (a, b) => a.value - b.value;
     const spread = this.topAndTail(values.slice().sort(compareValue));
-
-    const vMin = spread[0];
-    const vMax = spread[1];
+    const [vMin, vMax] = spread;
 
     return {
       left: vMin.percent,
@@ -58,35 +78,48 @@ class Rangeslider extends React.Component<Props, State> {
     };
   };
 
-  parseProps(min: number, max: number, rawValues: Array<number>) {
-    const range = max - min;
+  getValues = (rawValues: Array<number>) => {
+    const { min, max, range, step } = this.derivedProps;
+    const [alpha, omega] = range;
+    const extent = omega - alpha;
+
     const values = rawValues.map((value, i) => {
       value = value > max ? max : value;
       value = value < min ? min : value;
 
+      if (step > 0) {
+        value = Math.ceil(value / step) * step;
+      }
+
       const key = `handle-${i}`;
-      const delta = (value - min) / range;
+      const delta = (value - alpha) / extent;
       const percent = this.fmtPercent(delta);
 
       return { key, value, delta, percent };
     });
 
     const rangeStyle = this.getRangeStyle(values);
+    const newValues = { values, rangeStyle };
 
-    return { values, rangeStyle };
-  }
+    if(this.props) this.props.onChange(values);
+
+    return newValues;
+  };
 
   updateValues(key: mixed, values: Vals, newValue: number) {
+    const { orderLocked, min, max, minGap } = this.derivedProps;
+
     const getFreeValues = v => (v.key === key ? newValue : v.value);
 
     const getLockedValues = (v, i) => {
       if (v.key !== key) {
         return v.value;
       }
-      const a = values[i - 1] || { value: this.props.min - this.props.minGap };
-      const b = values[i + 1] || { value: this.props.max + this.props.minGap };
-      const prevValue = a.value + this.props.minGap;
-      const nextValue = b.value - this.props.minGap;
+
+      const a = values[i - 1] || { value: min - minGap };
+      const b = values[i + 1] || { value: max + minGap };
+      const prevValue = a.value + minGap;
+      const nextValue = b.value - minGap;
 
       if (newValue > prevValue && newValue < nextValue) {
         return newValue;
@@ -95,7 +128,7 @@ class Rangeslider extends React.Component<Props, State> {
       return v.value;
     };
 
-    return values.map(this.props.orderLocked ? getLockedValues : getFreeValues);
+    return values.map(orderLocked ? getLockedValues : getFreeValues);
   }
 
   // Handle mouse events
@@ -104,7 +137,7 @@ class Rangeslider extends React.Component<Props, State> {
     if (e.target.dataset) {
       if (e.target.dataset.handle) {
         this.setState({ draggedHandleKey: e.target.dataset.handle });
-      } else if (e.target.dataset.range) {
+      } else if (e.target.dataset.range && this.props.rangeDraggable) {
         this.setState({
           isDraggingRange: this.state.values.length > 1,
           rangeX: e.clientX
@@ -116,7 +149,9 @@ class Rangeslider extends React.Component<Props, State> {
   onMouseMove = (event: SyntheticMouseEvent<HTMLElement>) => {
     if (!this.state.draggedHandleKey && !this.state.isDraggingRange) return;
 
-    const { min, max } = this.props;
+    const { min, max, range } = this.derivedProps;
+    const [alpha, omega] = range;
+    const extent = omega - alpha;
     const { draggedHandleKey, values } = this.state;
 
     let clientWidth = 0;
@@ -131,17 +166,13 @@ class Rangeslider extends React.Component<Props, State> {
 
     if (draggedHandleKey) {
       const newPerc = getPercentX(event.clientX);
-      const newValue = newPerc * max;
+      const newValue = newPerc * extent + alpha;
 
       if (values.length === 1) {
-        this.setState(this.parseProps(min, max, [newValue]));
+        this.setState(this.getValues([newValue]));
       } else {
         this.setState(
-          this.parseProps(
-            min,
-            max,
-            this.updateValues(draggedHandleKey, values, newValue)
-          )
+          this.getValues(this.updateValues(draggedHandleKey, values, newValue))
         );
       }
     }
@@ -150,10 +181,10 @@ class Rangeslider extends React.Component<Props, State> {
       const oldPerc = getPercentX(this.state.rangeX);
       const newPerc = getPercentX(event.clientX);
       const delta = newPerc - oldPerc;
-      const offset = delta * max;
+      const offset = delta * extent;
 
       this.setState({
-        ...this.parseProps(min, max, values.map(v => v.value + offset)),
+        ...this.getValues(values.map(v => v.value + offset)),
         rangeX: event.clientX
       });
     }
@@ -183,13 +214,11 @@ class Rangeslider extends React.Component<Props, State> {
 
 Rangeslider.defaultProps = {
   value: 0,
-  min: 0,
-  max: 100,
-  step: 0,
   vertical: false,
   disabled: false,
   orderLocked: false,
   minGap: 0,
+  step: 0,
   rangeDraggable: true,
   rangePushable: false,
   onChange: () => {},

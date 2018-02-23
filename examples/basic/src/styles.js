@@ -1,4 +1,4 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 
 const sliderPadding = 20;
 const trackH = 8;
@@ -14,14 +14,26 @@ export const Slider = styled.div`
   box-sizing: border-box;
   position: relative;
   padding: ${sliderPadding}px ${sliderPadding * 2}px;
-  
-  if(props.disabled) {
-    & ${Handle} {
-      border-color: #ccc;
-      box-shadow: none;
-      cursor: not-allowed;
-    }
-  }
+
+  ${props =>
+    props.disabled &&
+    css`
+      & ${Handle} {
+        border-color: #ccc;
+        box-shadow: none;
+        cursor: not-allowed;
+      }
+    `} ${props =>
+      props.step &&
+      css`
+        & ${Handle} {
+          transition: 0.1s left;
+        }
+
+        & ${Range} {
+          transition: 0.1s width;
+        }
+      `};
 `;
 
 export const Track = styled.div`
@@ -66,5 +78,32 @@ export const Handle = styled.div`
   &:focus {
     box-shadow: 0 0 0 5px #96dbfa;
     outline: none;
+  }
+`;
+
+export const Scale = styled.div`
+  display: grid;
+  grid-template-columns: repeat(${props => `${props.step}`}, 1fr);
+  justify-items: end;
+  user-select: none;
+  color: #999;
+
+  & p {
+    position: relative;
+    width: 2em;
+    margin-top: 25px;
+    margin-right: -1em;
+    text-align: center;
+    font-size: 12px;
+
+    &::before {
+      content: "";
+      position: absolute;
+      bottom: 130%;
+      left: 50%;
+      margin-left: -4px; 
+      border: 4px solid transparent;
+      border-bottom-color: currentColor;
+    }
   }
 `;
