@@ -11,45 +11,39 @@ import * as React from "react";
 class Rangeslider extends React.Component<DerivedProps, State> {
   trackEl: ?HTMLElement;
   rangeEl: ?HTMLElement;
-  handles: Array<HTMLElement>;
+  clientWidth: number;
+  clientRect: { ["left" | "bottom"]: number };
 
   static defaultProps: DerivedProps;
 
-  state = {
-    values: [],
-    mounted: false,
-    rangeStyle: {left: "0", width: "0"},
-    draggedHandleKey: null,
-    isDraggingRange: false,
-    rangeX: 0
-  };
-  handles = [];
+  clientWidth = 0;
+  clientRect = { left: 0 };
+  handleStyle = { xProp: "left" };
+  rangeStyle = { xProp: "left", dProp: "width" };
 
   constructor(props: DerivedProps) {
     super();
+
+    if (props.vertical) {
+      this.handleStyle.xProp = "bottom";
+      this.rangeStyle = { xProp: "bottom", dProp: "height" };
+    }
+
+    this.state = {
+      ...this.parseProps(props.min, props.max, props.rawValues),
+      mounted: false,
+      handleIndex: -1,
+      isDraggingRange: false,
+      rangeX: 0
+    };
   }
 
-  componentDidMount() {
-    console.log("cdm called", this.handles, this.state.values);
-
-    ...this.parseProps(props.min, props.max, props.rawValues)
-  }
-
-  registerPart = (part: string) => (el: HTMLElement) => {
-    if (this.state.mounted) return;
-
-    switch (part) {
-      case parts.TRACK:
-        this.trackEl = el;
-        break;
-
-      case parts.RANGE:
-        this.rangeEl = el;
-        break;
-
-      case parts.HANDLE:
-        this.handles.push(el);
-        break;
+  getTrackRef = (el: HTMLElement) => {
+    if (el) {
+      console.log("getTrackRef", el, this.clientWidth, this.clientRect.left);
+      this.trackEl = el;
+      this.clientWidth = this.trackEl.clientWidth;
+      this.clientRect = this.trackEl.getBoundingClientRect();
     }
   };
 
@@ -57,22 +51,27 @@ class Rangeslider extends React.Component<DerivedProps, State> {
     return (v * 100).toFixed(1) + "%";
   }
 
-  topAndTail(arr: Vals): [Val, Val] {
+  topAndTail(values: Vals): [Val, Val] {
+    const arr = values.slice().sort((a, b) => a.value - b.value);
     return [arr[0], arr[arr.length - 1]];
   }
 
+  getHandleStyle = (percent: string) => {
+    return { [this.handleStyle.xProp]: percent };
+  };
+
   getRangeStyle = (values: Vals) => {
+    const { xProp, dProp } = this.rangeStyle;
+
     if (values.length === 1) {
-      return { left: "0", width: values[0].percent };
+      return { [xProp]: "0", [dProp]: values[0].percent };
     }
 
-    const compareValue = (a, b) => a.value - b.value;
-    const spread = this.topAndTail(values.slice().sort(compareValue));
-    const [vMin, vMax] = spread;
+    const [vMin, vMax] = this.topAndTail(values);
 
     return {
-      left: vMin.percent,
-      width: this.fmtPercent(vMax.delta - vMin.delta)
+      [xProp]: vMin.percent,
+      [dProp]: this.fmtPercent(vMax.delta - vMin.delta)
     };
   };
 
@@ -82,11 +81,11 @@ class Rangeslider extends React.Component<DerivedProps, State> {
       value = value > max ? max : value;
       value = value < min ? min : value;
 
-      const key = `handle-${i}`;
       const delta = (value - min) / range;
       const percent = this.fmtPercent(delta);
+      const handleStyle = this.getHandleStyle(percent);
 
-      return { key, value, delta, percent };
+      return { value, delta, percent, handleStyle };
     });
 
     const rangeStyle = this.getRangeStyle(values);
@@ -95,10 +94,10 @@ class Rangeslider extends React.Component<DerivedProps, State> {
   }
 
   updateValues(key: mixed, values: Vals, newValue: number) {
-    const getFreeValues = v => (v.key === key ? newValue : v.value);
+    const getFreeValues = (v, i) => (key === i ? newValue : v.value);
 
     const getLockedValues = (v, i) => {
-      if (v.key !== key) {
+      if (key !== i) {
         return v.value;
       }
       const a = values[i - 1] || { value: this.props.min - this.props.minGap };
@@ -118,88 +117,102 @@ class Rangeslider extends React.Component<DerivedProps, State> {
 
   // Handle mouse events
   //----------------------------------------------------------------------------
-  onMouseDown = (event: SyntheticMouseEvent<HTMLElement>) => {
-    if (event.target === this.rangeEl) {
-      this.setState({
-        isDraggingRange: this.state.values.length > 1,
-        rangeX: event.clientX
-      });
-    } else if (event.target === this.trackEl) {
-      // update values as group based on whether before or after
-    } else if (this.handles.includes(event.target)) {
-      console.log("onMouseDown:", this.handles.indexOf(event.target));
-    }
+  getPercentX = x => (x - this.clientRect.left) / this.clientWidth;
 
-    // if (event.target.dataset) {
-    //   if (event.target.dataset.handle) {
-    //     this.setState({ draggedHandleKey: event.target.dataset.handle });
-    //   } else if (event.target.dataset.range) {
-    //     this.setState({
-    //       isDraggingRange: this.state.values.length > 1,
-    //       rangeX: event.clientX
-    //     });
-    //   }
-    // }
+  unbindMouseMove = moveFn => () => {
+    document.removeEventListener("mousemove", moveFn);
+    document.removeEventListener("mouseup", this.unbindMouseMove);
+
+    this.setState({
+      isDraggingRange: false,
+      handleIndex: -1
+    });
   };
 
-  onMouseMove = (event: SyntheticMouseEvent<HTMLElement>) => {
-    if (!this.state.draggedHandleKey && !this.state.isDraggingRange) return;
+  bindMouseMove(moveFn) {
+    document.addEventListener("mousemove", moveFn);
+    document.addEventListener("mouseup", this.unbindMouseMove(moveFn));
+  }
+
+  onMouseDownRange = (event: SyntheticMouseEvent<HTMLElement>) => {
+    this.bindMouseMove(this.onDragRange);
+
+    this.setState({
+      isDraggingRange: this.state.values.length > 1,
+      rangeX: event.clientX
+    });
+  };
+
+  onDragRange = (event: SyntheticMouseEvent<HTMLElement>) => {
+    if (!this.state.isDraggingRange) return;
 
     const { min, max } = this.props;
-    const { draggedHandleKey, values } = this.state;
+    const { values } = this.state;
+    const oldPerc = this.getPercentX(this.state.rangeX);
+    const newPerc = this.getPercentX(event.clientX);
+    const delta = newPerc - oldPerc;
+    const offset = delta * max;
 
-    let clientWidth = 0;
-    let clientRect = { left: 0 };
+    this.setState({
+      ...this.parseProps(min, max, values.map(v => v.value + offset)),
+      rangeX: event.clientX
+    });
+  };
 
-    if (this.trackEl) {
-      clientWidth = this.trackEl.clientWidth;
-      clientRect = this.trackEl.getBoundingClientRect();
-    }
+  onMouseDownHandle = (index: number) => (
+    event: SyntheticMouseEvent<HTMLElement>
+  ) => {
+    this.setState({ handleIndex: index });
+    this.bindMouseMove(this.onDragHandle);
+  };
 
-    const getPercentX = x => (x - clientRect.left) / clientWidth;
+  onDragHandle = (event: SyntheticMouseEvent<HTMLElement>) => {
+    if (this.state.handleIndex < 0) return;
 
-    if (draggedHandleKey) {
-      const newPerc = getPercentX(event.clientX);
-      const newValue = newPerc * max;
+    const { min, max } = this.props;
+    const { handleIndex, values } = this.state;
 
-      if (values.length === 1) {
-        this.setState(this.parseProps(min, max, [newValue]));
-      } else {
-        this.setState(
-          this.parseProps(
-            min,
-            max,
-            this.updateValues(draggedHandleKey, values, newValue)
-          )
-        );
-      }
-    }
+    const newPerc = this.getPercentX(event.clientX);
+    const newValue = newPerc * max;
 
-    if (this.state.isDraggingRange) {
-      const oldPerc = getPercentX(this.state.rangeX);
-      const newPerc = getPercentX(event.clientX);
-      const delta = newPerc - oldPerc;
-      const offset = delta * max;
-
-      this.setState({
-        ...this.parseProps(min, max, values.map(v => v.value + offset)),
-        rangeX: event.clientX
-      });
+    if (values.length === 1) {
+      this.setState(this.parseProps(min, max, [newValue]));
+    } else {
+      this.setState(
+        this.parseProps(
+          min,
+          max,
+          this.updateValues(handleIndex, values, newValue)
+        )
+      );
     }
   };
 
-  onMouseUp = () => {
-    this.setState({ draggedHandleKey: null, isDraggingRange: false });
+  onClickTrack = () => {
+    console.log("onClickTrack called");
   };
 
   // Render
   //----------------------------------------------------------------------------
   render() {
-    return this.props.render(this.state, this.props, this.registerPart, {
-      onMouseDown: this.onMouseDown,
-      onMouseMove: this.onMouseMove,
-      onMouseUp: this.onMouseUp
-    });
+    const listeners = {
+      range: {
+        onMouseDown: this.onMouseDownRange
+      },
+      handle: index => ({
+        onMouseDown: this.onMouseDownHandle(index)
+      }),
+      track: {
+        onClick: this.onClickTrack
+      }
+    };
+
+    return this.props.render(
+      this.state,
+      this.props,
+      this.getTrackRef,
+      listeners
+    );
   }
 }
 
@@ -215,18 +228,8 @@ Rangeslider.defaultProps = {
   orderLocked: false,
   minGap: 0,
   rangeDraggable: true,
-  render: (
-    state,
-    props,
-    getRef: Function,
-    eventListeners: {
-      onMouseDown: Function,
-      onMouseMove: Function,
-      onMouseUp: Function
-    }
-  ) => {},
+  render: (state, props, getTrackRef: Function, listeners: {}) => {},
   children: null
 };
 
-export default Rangeslider
-
+export default Rangeslider;

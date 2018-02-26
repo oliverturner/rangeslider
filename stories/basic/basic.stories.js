@@ -3,42 +3,44 @@ import React from "react";
 import { storiesOf } from "@storybook/react";
 import { action } from "@storybook/addon-actions";
 import { linkTo } from "@storybook/addon-links";
+import {
+  withKnobs,
+  array,
+  boolean,
+  number
+} from "@storybook/addon-knobs/react";
 
 import RangeSlider, { parts } from "../../src";
 
 import { Demo, Row, Input } from "./demo";
 import { Slider, Range, Track, Handle } from "./styles";
 
-const getSlider = (state, props, registerPart, handlers) => {
-  return (
-    <Slider {...handlers}>
-      <Track innerRef={registerPart(parts.TRACK)}>
-        <Range
-          style={state.rangeStyle}
-          data-range="range"
-          innerRef={registerPart(parts.RANGE)}
+const getSlider = (state, props, getTrackRef, listeners) => (
+  <Slider>
+    <Track innerRef={getTrackRef} {...listeners.track}>
+      <Range style={state.rangeStyle} {...listeners.range} />
+      {state.values.map(({ handleStyle }, i) => (
+        <Handle
+          key={`handle-${i}`}
+          style={handleStyle}
+          {...listeners.handle(i)}
         />
-        {state.values.map(({ key, percent }, i) => (
-          <Handle
-            key={`handle-${i}`}
-            style={{ left: percent }}
-            data-handle={key}
-            innerRef={registerPart(parts.HANDLE)}
-          />
-        ))}
-      </Track>
-    </Slider>
-  );
-};
+      ))}
+    </Track>
+  </Slider>
+);
 
-storiesOf("RangeSlider", module).add("RangeSlider", () => (
+const stories = storiesOf("RangeSlider", module);
+stories.addDecorator(withKnobs);
+
+stories.add("RangeSlider", () => (
   <Demo>
     <RangeSlider
-      max={200}
+      max={number("max", 200)}
       value={[80, 100, 170]}
-      render={getSlider}
       orderLocked={true}
-      minGap={20}
+      minGap={number("minGap", 20)}
+      render={getSlider}
     />
   </Demo>
 ));
