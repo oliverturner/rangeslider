@@ -8,7 +8,7 @@ const makeHandle = ({ key, percent }) => (
   <Handle key={key} style={{ left: percent }} data-handle={key} />
 );
 
-const getSlider = (state, props, getTrackRef, handlers) => {
+const getSlider = (state, props, getTrackRef, getHandlerRef, handlers) => {
   return (
     <Demo>
       <Slider {...handlers}>

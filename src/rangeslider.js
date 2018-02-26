@@ -1,5 +1,3 @@
-// @flow
-
 import type {
   Val,
   Vals,
@@ -16,23 +14,25 @@ class Rangeslider extends React.Component<DerivedProps, State> {
   handles: Array<HTMLElement>;
 
   static defaultProps: DerivedProps;
-  
+
+  state = {
+    values: [],
+    mounted: false,
+    rangeStyle: {left: "0", width: "0"},
+    draggedHandleKey: null,
+    isDraggingRange: false,
+    rangeX: 0
+  };
   handles = [];
 
   constructor(props: DerivedProps) {
     super();
-
-    this.state = {
-      ...this.parseProps(props.min, props.max, props.rawValues),
-      draggedHandleKey: null,
-      isDraggingRange: false,
-      rangeX: 0,
-      mounted: false
-    };
   }
 
   componentDidMount() {
     console.log("cdm called", this.handles, this.state.values);
+
+    ...this.parseProps(props.min, props.max, props.rawValues)
   }
 
   registerPart = (part: string) => (el: HTMLElement) => {
@@ -228,39 +228,5 @@ Rangeslider.defaultProps = {
   children: null
 };
 
-const Wrapper = (props: Props) => {
-  let { value, min, max, range } = props;
+export default Rangeslider
 
-  const rawValues = Array.isArray(value) ? value : [value];
-
-  if (typeof min === "undefined") {
-    min = (range && range[0]) || 0;
-  }
-  if (typeof max === "undefined") {
-    max = (range && range[1]) || 0;
-  }
-  if (typeof range === "undefined") {
-    range = [min, max];
-  }
-
-  const extent = range[1] - range[0];
-
-  const derivedProps: DerivedProps = {
-    ...props,
-    rawValues,
-    min,
-    max,
-    range,
-    extent
-  };
-
-  return <Rangeslider {...derivedProps} />;
-};
-
-export const parts = {
-  TRACK: "track",
-  HANDLE: "handle",
-  RANGE: "range"
-};
-
-export default Wrapper;

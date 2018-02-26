@@ -10,34 +10,46 @@ declare module "@oliverturner/rangeslider" {
 
   declare type Vals = Array<Val>;
 
-  declare type Props = {|
-    min: number,
-    max: number,
-    value: number | Array<number>,
+  declare type SharedProps = {
+    step?: number,
+    children?: React.Element<*>,
+    rangeDraggable?: boolean,
+    orderLocked?: boolean,
+    vertical?: boolean,
+    onChange?: Function,
+    onBeforeChange?: Function,
+    onAfterChange?: Function,
     render: (
       state: State,
-      props: Props,
-      getTrackRef: Function,
-      mouseListeners: {
-        onMouseDown: Function,
-        onMouseMove: Function,
-        onMouseUp: Function
+      props: DerivedProps,
+      getRef: (part: string) => (el: HTMLElement) => void,
+      eventListeners: {
+        onMouseDown: (event: SyntheticMouseEvent<HTMLElement>) => void,
+        onMouseMove: (event: SyntheticMouseEvent<HTMLElement>) => void,
+        onMouseUp: () => void
       }
-    ) => React.Element<*>,
-    children: ?React.Element<*>,
-    step: number,
-    disabled: boolean,
-    vertical: boolean,
-    orderLocked: boolean,
-    minGap: number,
-    rangePushable: boolean,
-    rangeDraggable: boolean,
-    onChange: Function,
-    onBeforeChange: Function,
-    onAfterChange: Function
-  |};
+    ) => React.Element<*>
+  };
+
+  declare type Props = SharedProps & {
+    value: number | Array<number>,
+    min?: number,
+    max?: number,
+    range?: [number, number],
+    minGap?: number
+  };
+
+  declare type DerivedProps = SharedProps & {
+    rawValues: Array<number>,
+    min: number,
+    max: number,
+    range: [number, number],
+    extent: number,
+    minGap: number
+  };
 
   declare type State = {
+    mounted: boolean;
     values: Vals,
     rangeStyle: {| left: string, width: string |},
     draggedHandleKey: mixed | null,
