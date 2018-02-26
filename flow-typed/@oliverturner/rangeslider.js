@@ -23,11 +23,13 @@ declare module "@oliverturner/rangeslider" {
       state: State,
       props: DerivedProps,
       getTrackRef: (el: HTMLElement) => void,
-      eventListeners: {
+      listeners: {
         range: {
           onMouseDown: (event: SyntheticMouseEvent<HTMLElement>) => void
         },
-        handle: {
+        handle: (
+          index: number
+        ) => {
           onMouseDown: (event: SyntheticMouseEvent<HTMLElement>) => void
         },
         track: { onClick: (event: SyntheticMouseEvent<HTMLElement>) => void }

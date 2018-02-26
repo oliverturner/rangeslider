@@ -128,7 +128,7 @@ class Rangeslider extends React.Component<DerivedProps, State> {
     document.addEventListener("mouseup", this.unbindMouseMove(moveFn));
   }
 
-  onMouseDownRange = (event: SyntheticMouseEvent<HTMLElement>) => {
+  onRangePress = (event: SyntheticMouseEvent<HTMLElement>) => {
     this.bindMouseMove(this.onDragRange);
 
     this.setState({
@@ -153,7 +153,7 @@ class Rangeslider extends React.Component<DerivedProps, State> {
     });
   };
 
-  onMouseDownHandle = (index: number) => () => {
+  onHandlePress = (index: number) => () => {
     this.setState({ handleIndex: index });
     this.bindMouseMove(this.onDragHandle);
   };
@@ -189,10 +189,10 @@ class Rangeslider extends React.Component<DerivedProps, State> {
   render() {
     const listeners = {
       range: {
-        onMouseDown: this.onMouseDownRange
+        onMouseDown: this.onRangePress
       },
       handle: (index: number) => ({
-        onMouseDown: this.onMouseDownHandle(index)
+        onMouseDown: this.onHandlePress(index)
       }),
       track: {
         onClick: this.onClickTrack
