@@ -2,10 +2,10 @@ import * as React from "react";
 
 declare module "@oliverturner/rangeslider" {
   declare type Val = {|
-    key: string,
     value: number,
     delta: number,
-    percent: string
+    percent: string,
+    handleStyle: { ["left" | "bottom"]: string }
   |};
 
   declare type Vals = Array<Val>;
@@ -22,11 +22,15 @@ declare module "@oliverturner/rangeslider" {
     render: (
       state: State,
       props: DerivedProps,
-      getRef: (part: string) => (el: HTMLElement) => void,
+      getTrackRef: (el: HTMLElement) => void,
       eventListeners: {
-        onMouseDown: (event: SyntheticMouseEvent<HTMLElement>) => void,
-        onMouseMove: (event: SyntheticMouseEvent<HTMLElement>) => void,
-        onMouseUp: () => void
+        range: {
+          onMouseDown: (event: SyntheticMouseEvent<HTMLElement>) => void
+        },
+        handle: {
+          onMouseDown: (event: SyntheticMouseEvent<HTMLElement>) => void
+        },
+        track: { onClick: (event: SyntheticMouseEvent<HTMLElement>) => void }
       }
     ) => React.Element<*>
   };
@@ -49,10 +53,9 @@ declare module "@oliverturner/rangeslider" {
   };
 
   declare type State = {
-    mounted: boolean;
     values: Vals,
     rangeStyle: {| left: string, width: string |},
-    draggedHandleKey: mixed | null,
+    handleIndex: number,
     isDraggingRange: boolean,
     rangeX: number
   };

@@ -19,12 +19,17 @@
     "@storybook/addons": "^3.3.14",
     "@storybook/react": "^3.3.14",
     "babel-core": "^7.0.0-0",
+    "babel-eslint": "8.2.2",
     "babel-plugin-styled-components": "1.5.0",
+    "eslint": "4.18.1",
+    "eslint-plugin-flowtype": "2.46.1",
+    "eslint-plugin-react": "7.7.0",
     "react-dom": "16.2.0",
     "styled-components": "3.1.6"
   },
   "scripts": {
     "sb": "start-storybook -p 6006",
-    "sb:build": "build-storybook"
+    "sb:build": "build-storybook",
+    "lint": "eslint src"
   }
 }

@@ -1,10 +1,7 @@
 // @flow
 
 import type {
-  Val,
-  Vals,
   Props,
-  State,
   DerivedProps
 } from "@oliverturner/rangeslider";
 

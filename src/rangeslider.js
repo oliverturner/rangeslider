@@ -1,10 +1,6 @@
-import type {
-  Val,
-  Vals,
-  Props,
-  State,
-  DerivedProps
-} from "@oliverturner/rangeslider";
+// @flow
+
+import type { Val, Vals, State, DerivedProps } from "@oliverturner/rangeslider";
 
 import * as React from "react";
 
@@ -31,7 +27,6 @@ class Rangeslider extends React.Component<DerivedProps, State> {
 
     this.state = {
       ...this.parseProps(props.min, props.max, props.rawValues),
-      mounted: false,
       handleIndex: -1,
       isDraggingRange: false,
       rangeX: 0
@@ -40,7 +35,6 @@ class Rangeslider extends React.Component<DerivedProps, State> {
 
   getTrackRef = (el: HTMLElement) => {
     if (el) {
-      console.log("getTrackRef", el, this.clientWidth, this.clientRect.left);
       this.trackEl = el;
       this.clientWidth = this.trackEl.clientWidth;
       this.clientRect = this.trackEl.getBoundingClientRect();
@@ -77,7 +71,7 @@ class Rangeslider extends React.Component<DerivedProps, State> {
 
   parseProps(min: number, max: number, rawValues: Array<number>) {
     const range = max - min;
-    const values = rawValues.map((value, i) => {
+    const values = rawValues.map((value: number) => {
       value = value > max ? max : value;
       value = value < min ? min : value;
 
@@ -117,11 +111,11 @@ class Rangeslider extends React.Component<DerivedProps, State> {
 
   // Handle mouse events
   //----------------------------------------------------------------------------
-  getPercentX = x => (x - this.clientRect.left) / this.clientWidth;
+  getPercentX = (x: number) => (x - this.clientRect.left) / this.clientWidth;
 
-  unbindMouseMove = moveFn => () => {
+  unbindMouseMove = (moveFn: Function) => () => {
     document.removeEventListener("mousemove", moveFn);
-    document.removeEventListener("mouseup", this.unbindMouseMove);
+    document.removeEventListener("mouseup", this.unbindMouseMove(moveFn));
 
     this.setState({
       isDraggingRange: false,
@@ -129,7 +123,7 @@ class Rangeslider extends React.Component<DerivedProps, State> {
     });
   };
 
-  bindMouseMove(moveFn) {
+  bindMouseMove(moveFn: Function) {
     document.addEventListener("mousemove", moveFn);
     document.addEventListener("mouseup", this.unbindMouseMove(moveFn));
   }
@@ -159,9 +153,7 @@ class Rangeslider extends React.Component<DerivedProps, State> {
     });
   };
 
-  onMouseDownHandle = (index: number) => (
-    event: SyntheticMouseEvent<HTMLElement>
-  ) => {
+  onMouseDownHandle = (index: number) => () => {
     this.setState({ handleIndex: index });
     this.bindMouseMove(this.onDragHandle);
   };
@@ -199,7 +191,7 @@ class Rangeslider extends React.Component<DerivedProps, State> {
       range: {
         onMouseDown: this.onMouseDownRange
       },
-      handle: index => ({
+      handle: (index: number) => ({
         onMouseDown: this.onMouseDownHandle(index)
       }),
       track: {
@@ -228,7 +220,7 @@ Rangeslider.defaultProps = {
   orderLocked: false,
   minGap: 0,
   rangeDraggable: true,
-  render: (state, props, getTrackRef: Function, listeners: {}) => {},
+  render: () => {},
   children: null
 };
 

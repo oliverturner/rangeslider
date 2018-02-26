@@ -1,18 +1,11 @@
 import React from "react";
 
 import { storiesOf } from "@storybook/react";
-import { action } from "@storybook/addon-actions";
-import { linkTo } from "@storybook/addon-links";
-import {
-  withKnobs,
-  array,
-  boolean,
-  number
-} from "@storybook/addon-knobs/react";
+import { withKnobs, number } from "@storybook/addon-knobs/react";
 
-import RangeSlider, { parts } from "../../src";
+import RangeSlider from "../../src";
 
-import { Demo, Row, Input } from "./demo";
+import { Demo } from "./demo";
 import { Slider, Range, Track, Handle } from "./styles";
 
 const getSlider = (state, props, getTrackRef, listeners) => (
@@ -30,7 +23,7 @@ const getSlider = (state, props, getTrackRef, listeners) => (
   </Slider>
 );
 
-const stories = storiesOf("RangeSlider", module);
+const stories = storiesOf("RangeSlider");
 stories.addDecorator(withKnobs);
 
 stories.add("RangeSlider", () => (
