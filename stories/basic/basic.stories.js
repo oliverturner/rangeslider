@@ -39,7 +39,7 @@ stories.add("RangeSlider", () => (
       max={number("max", 200)}
       value={[80, 100, 170]}
       orderLocked={true}
-      minGap={number("minGap", 20)}
+      minGap={number("minGap", 10)}
       render={getSlider}
     />
   </Demo>
