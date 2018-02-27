@@ -26,11 +26,24 @@ class Rangeslider extends React.Component<DerivedProps, State> {
     }
 
     this.state = {
-      ...this.parseProps(props.min, props.max, props.rawValues),
+      ...this.getValues(props, props.rawValues),
       handleIndex: -1,
       isDraggingRange: false,
       rangeX: 0
     };
+  }
+
+  componentWillReceiveProps(newProps: DerivedProps) {
+    console.log("componentWillReceiveProps", newProps);
+
+    const current = this.state.values.map(v => v.value);
+    const updated = newProps.rawValues;
+    const areEqual = (a, b) => a.every((v, i) => v === b[i]);
+    if (!areEqual(current, updated)) {
+      this.setState({
+        ...this.getValues(newProps, newProps.rawValues)
+      });
+    }
   }
 
   getTrackRef = (el: HTMLElement) => {
@@ -69,20 +82,35 @@ class Rangeslider extends React.Component<DerivedProps, State> {
     };
   };
 
-  parseProps(min: number, max: number, rawValues: Array<number>) {
-    const range = max - min;
-    const values = rawValues.map((value: number) => {
+  getValues(props: DerivedProps, rawValues: Array<number>) {
+    const { min, max, range, extent, step, onChange } = props;
+    const [alpha] = range;
+
+    const updateValue = (value: number) => {
       value = value > max ? max : value;
       value = value < min ? min : value;
 
-      const delta = (value - min) / range;
+      if (step > 0) {
+        console.group("round")
+        console.log("before", `${value}/${step}`, value / step, value);
+
+        value = Math.round(value / step) * step;
+
+        console.log("after", `${value}/${step}`, value / step, value);
+        console.groupEnd()
+      }
+
+      const delta = (value - alpha) / extent;
       const percent = this.fmtPercent(delta);
       const handleStyle = this.getHandleStyle(percent);
 
       return { value, delta, percent, handleStyle };
-    });
+    };
 
+    const values = rawValues.map(updateValue);
     const rangeStyle = this.getRangeStyle(values);
+
+    if (onChange) onChange(values);
 
     return { values, rangeStyle };
   }
@@ -129,31 +157,39 @@ class Rangeslider extends React.Component<DerivedProps, State> {
   }
 
   onRangePress = (event: SyntheticMouseEvent<HTMLElement>) => {
+    if (
+      this.props.disabled ||
+      !this.props.rangeDraggable ||
+      this.state.values.length === 1
+    )
+      return;
+
     this.bindMouseMove(this.onDragRange);
 
     this.setState({
-      isDraggingRange: this.state.values.length > 1,
-      rangeX: event.clientX
+      isDraggingRange: true,
+      rangeX: this.getPercentX(event.clientX)
     });
   };
 
   onDragRange = (event: SyntheticMouseEvent<HTMLElement>) => {
     if (!this.state.isDraggingRange) return;
 
-    const { min, max } = this.props;
-    const { values } = this.state;
-    const oldPerc = this.getPercentX(this.state.rangeX);
-    const newPerc = this.getPercentX(event.clientX);
-    const delta = newPerc - oldPerc;
-    const offset = delta * max;
+    const { extent } = this.props;
+    const { values, rangeX: oldRangeX } = this.state;
+    const newRangeX = this.getPercentX(event.clientX);
+    const delta = newRangeX - oldRangeX;
+    const offset = delta * extent;
 
     this.setState({
-      ...this.parseProps(min, max, values.map(v => v.value + offset)),
-      rangeX: event.clientX
+      ...this.getValues(this.props, values.map(v => v.value + offset)),
+      rangeX: newRangeX
     });
   };
 
   onHandlePress = (index: number) => () => {
+    if (this.props.disabled) return;
+
     this.setState({ handleIndex: index });
     this.bindMouseMove(this.onDragHandle);
   };
@@ -161,19 +197,19 @@ class Rangeslider extends React.Component<DerivedProps, State> {
   onDragHandle = (event: SyntheticMouseEvent<HTMLElement>) => {
     if (this.state.handleIndex < 0) return;
 
-    const { min, max } = this.props;
+    const { range, extent } = this.props;
+    const [alpha] = range;
     const { handleIndex, values } = this.state;
 
     const newPerc = this.getPercentX(event.clientX);
-    const newValue = newPerc * max;
+    const newValue = newPerc * extent + alpha;
 
     if (values.length === 1) {
-      this.setState(this.parseProps(min, max, [newValue]));
+      this.setState(this.getValues(this.props, [newValue]));
     } else {
       this.setState(
-        this.parseProps(
-          min,
-          max,
+        this.getValues(
+          this.props,
           this.updateValues(handleIndex, values, newValue)
         )
       );
@@ -215,6 +251,7 @@ Rangeslider.defaultProps = {
   step: 0,
   range: [0, 0],
   extent: 0,
+  unit: 0,
   vertical: false,
   disabled: false,
   orderLocked: false,

@@ -1,9 +1,8 @@
-import styled from "styled-components";
+import styled, { css } from "styled-components";
 
 const sliderPadding = 20;
 const trackH = 8;
 const handleWH = 16;
-const handleBorder = 2;
 const handleOffset = (handleWH - trackH) * -0.5;
 
 export const Slider = styled.div`
@@ -85,32 +84,5 @@ export const Handle = styled.button`
   &:focus {
     box-shadow: 0 0 0 5px #96dbfa;
     outline: none;
-  }
-`;
-
-export const Scale = styled.div`
-  display: grid;
-  grid-template-columns: repeat(${props => `${props.step}`}, 1fr);
-  justify-items: end;
-  user-select: none;
-  color: #999;
-
-  & p {
-    position: relative;
-    width: 2em;
-    margin-top: 25px;
-    margin-right: -1em;
-    text-align: center;
-    font-size: 12px;
-
-    &::before {
-      content: "";
-      position: absolute;
-      bottom: 130%;
-      left: 50%;
-      margin-left: -4px;
-      border: 4px solid transparent;
-      border-bottom-color: currentColor;
-    }
   }
 `;

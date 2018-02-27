@@ -11,11 +11,11 @@ declare module "@oliverturner/rangeslider" {
   declare type Vals = Array<Val>;
 
   declare type SharedProps = {
-    step?: number,
     children?: React.Element<*>,
     rangeDraggable?: boolean,
     orderLocked?: boolean,
     vertical?: boolean,
+    disabled?: boolean,
     onChange?: Function,
     onBeforeChange?: Function,
     onAfterChange?: Function,
@@ -42,7 +42,9 @@ declare module "@oliverturner/rangeslider" {
     min?: number,
     max?: number,
     range?: [number, number],
-    minGap?: number
+    minGap?: number,
+    step?: number,
+    unit?: number
   };
 
   declare type DerivedProps = SharedProps & {
@@ -51,7 +53,9 @@ declare module "@oliverturner/rangeslider" {
     max: number,
     range: [number, number],
     extent: number,
-    minGap: number
+    minGap: number,
+    step: number,
+    unit: number
   };
 
   declare type State = {
