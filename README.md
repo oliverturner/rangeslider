@@ -17,9 +17,5 @@ remaining features are...
 
 1. ACCESSIBILITY!
 1. Touch support
-1. Allow update via props
-1. Steps
 1. Lifecycle hooks
-1. Toggle enabled state
 1. Vertical mode
-1. Pushable handles

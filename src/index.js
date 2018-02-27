@@ -1,12 +1,12 @@
 // @flow
 
-import type { Props, DerivedProps } from "@oliverturner/rangeslider";
+import type { Props, RawProps } from "@oliverturner/rangeslider";
 
 import * as React from "react";
 
 import Rangeslider from "./rangeslider";
 
-const Wrapper = (props: Props) => {
+const Wrapper = (props: RawProps) => {
   let { value, min, max, range, step } = props;
 
   const rawValues = Array.isArray(value) ? value : [value];
@@ -24,7 +24,7 @@ const Wrapper = (props: Props) => {
   const extent = range[1] - range[0];
   const unit = step || extent / 20;
 
-  const derivedProps: DerivedProps = {
+  const derivedProps: Props = {
     ...props,
     rawValues,
     min,

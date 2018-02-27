@@ -1,3 +1,7 @@
+// @flow
+
+import type { State, Props, SlideListeners } from "@oliverturner/rangeslider";
+
 import React from "react";
 
 import { storiesOf } from "@storybook/react";
@@ -10,10 +14,15 @@ import { getControls, getScale } from "../_demo/ui";
 
 import { Slider, Range, Track, Handle } from "./styles";
 
-const getSlider = (state, props, getTrackRef, listeners) => {
+const getSlider = (
+  state: State,
+  props: Props,
+  getTrackRef: Function,
+  listeners: SlideListeners
+) => {
   const { disabled, step, children } = props;
   return (
-    <Slider disabled={props.disabled} step={props.step}>
+    <Slider disabled={disabled} step={step}>
       <Track innerRef={getTrackRef} {...listeners.track}>
         <Range style={state.rangeStyle} {...listeners.range} />
         {state.values.map(({ handleStyle }, i) => (
@@ -24,7 +33,7 @@ const getSlider = (state, props, getTrackRef, listeners) => {
           />
         ))}
       </Track>
-      {props.children}
+      {children}
     </Slider>
   );
 };

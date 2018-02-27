@@ -1,23 +1,23 @@
 // @flow
 
-import type { Val, Vals, State, DerivedProps } from "@oliverturner/rangeslider";
+import type { Val, Vals, State, Props } from "@oliverturner/rangeslider";
 
 import * as React from "react";
 
-class Rangeslider extends React.Component<DerivedProps, State> {
+class Rangeslider extends React.Component<Props, State> {
   trackEl: ?HTMLElement;
   rangeEl: ?HTMLElement;
   clientWidth: number;
   clientRect: { ["left" | "bottom"]: number };
 
-  static defaultProps: DerivedProps;
+  static defaultProps: Props;
 
   clientWidth = 0;
   clientRect = { left: 0 };
   handleStyle = { xProp: "left" };
   rangeStyle = { xProp: "left", dProp: "width" };
 
-  constructor(props: DerivedProps) {
+  constructor(props: Props) {
     super();
 
     if (props.vertical) {
@@ -33,7 +33,7 @@ class Rangeslider extends React.Component<DerivedProps, State> {
     };
   }
 
-  componentWillReceiveProps(newProps: DerivedProps) {
+  componentWillReceiveProps(newProps: Props) {
     console.log("componentWillReceiveProps", newProps);
 
     const current = this.state.values.map(v => v.value);
@@ -82,7 +82,7 @@ class Rangeslider extends React.Component<DerivedProps, State> {
     };
   };
 
-  getValues(props: DerivedProps, rawValues: Array<number>) {
+  getValues(props: Props, rawValues: Array<number>) {
     const { min, max, range, extent, step, onChange } = props;
     const [alpha] = range;
 
@@ -91,13 +91,13 @@ class Rangeslider extends React.Component<DerivedProps, State> {
       value = value < min ? min : value;
 
       if (step > 0) {
-        console.group("round")
+        console.group("round");
         console.log("before", `${value}/${step}`, value / step, value);
 
         value = Math.round(value / step) * step;
 
         console.log("after", `${value}/${step}`, value / step, value);
-        console.groupEnd()
+        console.groupEnd();
       }
 
       const delta = (value - alpha) / extent;
@@ -110,7 +110,10 @@ class Rangeslider extends React.Component<DerivedProps, State> {
     const values = rawValues.map(updateValue);
     const rangeStyle = this.getRangeStyle(values);
 
-    if (onChange) onChange(values);
+    // Notify subcribers of updated values
+    if (onChange) {
+      onChange(values);
+    }
 
     return { values, rangeStyle };
   }
@@ -137,6 +140,7 @@ class Rangeslider extends React.Component<DerivedProps, State> {
     return values.map(this.props.orderLocked ? getLockedValues : getFreeValues);
   }
 
+  //----------------------------------------------------------------------------
   // Handle mouse events
   //----------------------------------------------------------------------------
   getPercentX = (x: number) => (x - this.clientRect.left) / this.clientWidth;
@@ -156,6 +160,8 @@ class Rangeslider extends React.Component<DerivedProps, State> {
     document.addEventListener("mouseup", this.unbindMouseMove(moveFn));
   }
 
+  // Range mouse listeners
+  //----------------------------------------------------------------------------
   onRangePress = (event: SyntheticMouseEvent<HTMLElement>) => {
     if (
       this.props.disabled ||
@@ -185,6 +191,24 @@ class Rangeslider extends React.Component<DerivedProps, State> {
       ...this.getValues(this.props, values.map(v => v.value + offset)),
       rangeX: newRangeX
     });
+  };
+
+  onRangeFocus = () => {
+    console.log("onRangeFocus");
+  };
+  onRangeBlur = () => {
+    console.log("onRangeBlur");
+  };
+
+  // Handle mouse listeners
+  //----------------------------------------------------------------------------
+  // When tabbing to a handle bind keyboard listeners
+  onHandleFocus = (index: number) => () => {
+    console.log("onHandleFocus", index);
+  };
+
+  onHandleBlur = (index: number) => () => {
+    console.log("onHandleBlur", index);
   };
 
   onHandlePress = (index: number) => () => {
@@ -225,10 +249,14 @@ class Rangeslider extends React.Component<DerivedProps, State> {
   render() {
     const listeners = {
       range: {
-        onMouseDown: this.onRangePress
+        onMouseDown: this.onRangePress,
+        onFocus: this.onRangeFocus,
+        onBlur: this.onRangeBlur
       },
       handle: (index: number) => ({
-        onMouseDown: this.onHandlePress(index)
+        onMouseDown: this.onHandlePress(index),
+        onFocus: this.onHandleFocus(index),
+        onBlur: this.onHandleFocus(index)
       }),
       track: {
         onClick: this.onClickTrack

@@ -10,6 +10,22 @@ declare module "@oliverturner/rangeslider" {
 
   declare type Vals = Array<Val>;
 
+  declare type SlideListeners = {
+    range: {
+      onMouseDown: (event: SyntheticMouseEvent<HTMLElement>) => void,
+      onFocus: (event: SyntheticMouseEvent<HTMLElement>) => void,
+      onBlur: (event: SyntheticMouseEvent<HTMLElement>) => void
+    },
+    handle: (
+      index: number
+    ) => {
+      onMouseDown: (event: SyntheticMouseEvent<HTMLElement>) => void,
+      onFocus: (event: SyntheticMouseEvent<HTMLElement>) => void,
+      onBlur: (event: SyntheticMouseEvent<HTMLElement>) => void
+    },
+    track: { onClick: (event: SyntheticMouseEvent<HTMLElement>) => void }
+  };
+
   declare type SharedProps = {
     children?: React.Element<*>,
     rangeDraggable?: boolean,
@@ -21,23 +37,13 @@ declare module "@oliverturner/rangeslider" {
     onAfterChange?: Function,
     render: (
       state: State,
-      props: DerivedProps,
+      props: Props,
       getTrackRef: (el: HTMLElement) => void,
-      listeners: {
-        range: {
-          onMouseDown: (event: SyntheticMouseEvent<HTMLElement>) => void
-        },
-        handle: (
-          index: number
-        ) => {
-          onMouseDown: (event: SyntheticMouseEvent<HTMLElement>) => void
-        },
-        track: { onClick: (event: SyntheticMouseEvent<HTMLElement>) => void }
-      }
+      listeners: SlideListeners
     ) => React.Element<*>
   };
 
-  declare type Props = SharedProps & {
+  declare type RawProps = SharedProps & {
     value: number | Array<number>,
     min?: number,
     max?: number,
@@ -47,7 +53,7 @@ declare module "@oliverturner/rangeslider" {
     unit?: number
   };
 
-  declare type DerivedProps = SharedProps & {
+  declare type Props = SharedProps & {
     rawValues: Array<number>,
     min: number,
     max: number,
