@@ -13,6 +13,8 @@
  * https://github.com/flowtype/flow-typed
  */
 
+// @flow
+
 declare module "rc-util" {
   declare module.exports: any;
 }
@@ -163,11 +165,18 @@ declare module "rc-util/lib/guid" {
 }
 
 declare module "rc-util/lib/KeyCode" {
-  // declare type keyCode = {
-  //   ["UP" | "RIGHT" | "DOWN" | "LEFT"]: string
-  // };
+  declare type keyCode = {|
+    UP: string,
+    RIGHT: string,
+    DOWN: string,
+    LEFT: string,
+    END: string,
+    HOME: string,
+    PAGE_UP: string,
+    PAGE_DOWN: string
+  |};
 
-  declare type keyCode = {UP: string};
+  declare module.exports: keyCode;
 }
 
 declare module "rc-util/lib/pickAttrs" {
