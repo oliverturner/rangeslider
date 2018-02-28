@@ -4,9 +4,7 @@ import type { Props } from "@oliverturner/rangeslider";
 
 import keyCode from "rc-util/lib/KeyCode";
 
-export function getKeyboardValueMutator(
-  event: SyntheticKeyboardEvent<*>
-) {
+export function keypressActions(event: SyntheticKeyboardEvent<*>) {
   switch (event.keyCode) {
     case keyCode.UP:
     case keyCode.RIGHT:
