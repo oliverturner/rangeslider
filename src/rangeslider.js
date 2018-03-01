@@ -29,7 +29,7 @@ class Rangeslider extends React.Component<Props, State> {
       ...this.getValues(props, props.rawValues),
       handleIndex: -1,
       isDraggingRange: false,
-      rangeX: 0
+      rangeOffset: 0
     };
   }
 
@@ -91,13 +91,7 @@ class Rangeslider extends React.Component<Props, State> {
       value = value < min ? min : value;
 
       if (step > 0) {
-        console.group("round");
-        console.log("before", `${value}/${step}`, value / step, value);
-
         value = Math.round(value / step) * step;
-
-        console.log("after", `${value}/${step}`, value / step, value);
-        console.groupEnd();
       }
 
       const delta = (value - alpha) / extent;
@@ -143,7 +137,7 @@ class Rangeslider extends React.Component<Props, State> {
   //----------------------------------------------------------------------------
   // Handle mouse events
   //----------------------------------------------------------------------------
-  getPercentX = (x: number) => (x - this.clientRect.left) / this.clientWidth;
+  getDeltaX = (x: number) => (x - this.clientRect.left) / this.clientWidth;
 
   unbindMouseMove = (moveFn: Function) => () => {
     document.removeEventListener("mousemove", moveFn);
@@ -163,34 +157,44 @@ class Rangeslider extends React.Component<Props, State> {
   // Range mouse listeners
   //----------------------------------------------------------------------------
   onRangePress = (event: SyntheticMouseEvent<HTMLElement>) => {
-    if (
+    const undraggable = () =>
       this.props.disabled ||
       !this.props.rangeDraggable ||
-      this.state.values.length === 1
-    )
-      return;
+      this.state.values.length === 1;
+
+    if (!undraggable) return;
 
     this.bindMouseMove(this.onDragRange);
 
+    const [first] = this.topAndTail(this.state.values);
+    const rangeX = this.getDeltaX(event.clientX);
+
     this.setState({
       isDraggingRange: true,
-      rangeX: this.getPercentX(event.clientX)
+      rangeOffset: rangeX - first.delta
     });
   };
 
   onDragRange = (event: SyntheticMouseEvent<HTMLElement>) => {
     if (!this.state.isDraggingRange) return;
 
-    const { extent } = this.props;
-    const { values, rangeX: oldRangeX } = this.state;
-    const newRangeX = this.getPercentX(event.clientX);
-    const delta = newRangeX - oldRangeX;
-    const offset = delta * extent;
+    const { range, extent, step, min, max } = this.props;
+    const { rangeOffset, values } = this.state;
+    const [alpha] = range;
 
-    this.setState({
-      ...this.getValues(this.props, values.map(v => v.value + offset)),
-      rangeX: newRangeX
-    });
+    const newPerc = this.getDeltaX(event.clientX) - rangeOffset;
+    const newValue = newPerc * extent + alpha;
+    const stepValue = Math.round(newValue / step) * step;
+    const value = step > 0 ? stepValue : newValue;
+    const offset = value - values[0].value;
+
+    const newValues = values.map(v => v.value + offset);
+
+    if (newValues.every(v => v >= min && v <= max)) {
+      this.setState({
+        ...this.getValues(this.props, values.map(v => v.value + offset))
+      });
+    }
   };
 
   onRangeFocus = () => {
@@ -225,7 +229,7 @@ class Rangeslider extends React.Component<Props, State> {
     const [alpha] = range;
     const { handleIndex, values } = this.state;
 
-    const newPerc = this.getPercentX(event.clientX);
+    const newPerc = this.getDeltaX(event.clientX);
     const newValue = newPerc * extent + alpha;
 
     if (values.length === 1) {

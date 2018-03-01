@@ -1,7 +1,11 @@
+// @flow
+
+import type { RawProps } from "@oliverturner/rangeslider";
+
 import * as React from "react";
 import { object, number, boolean } from "@storybook/addon-knobs/react";
 
-export function getControls(props) {
+export function getControls(props: RawProps) {
   const {
     value,
     range,
@@ -23,14 +27,23 @@ export function getControls(props) {
     min: min && number("min", min),
     max: max && number("max", max),
     step: step && number("step", step),
-    rangeDraggable: rangeDraggable && boolean("rangeDraggable", rangeDraggable),
-    orderLocked: orderLocked && boolean("orderLocked", orderLocked),
+    rangeDraggable:
+      typeof rangeDraggable !== "undefined" &&
+      boolean("rangeDraggable", rangeDraggable),
+    orderLocked:
+      typeof orderLocked !== "undefined" && boolean("orderLocked", orderLocked),
     minGap: minGap && number("minGap", minGap),
-    disabled: disabled && boolean("disabled", disabled)
+    disabled: typeof disabled !== "undefined" && boolean("disabled", disabled)
   };
 }
 
-export function getScale({ min, max, range, step }) {
+type Scale = {
+  min: number,
+  max: number,
+  range: [number, number],
+  step: number
+};
+export function getScale({ min, max, range, step }: Scale) {
   if (typeof min === "undefined") {
     min = (range && range[0]) || 0;
   }

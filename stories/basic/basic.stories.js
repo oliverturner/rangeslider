@@ -81,7 +81,7 @@ const config = {
     min: 50
   },
   "Multi handle - stepped": {
-    value: [50, 100, 150],
+    value: [80, 100, 120],
     range: [0, 200],
     step: 20
   },

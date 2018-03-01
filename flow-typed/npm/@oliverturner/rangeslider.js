@@ -8,7 +8,14 @@ declare module "@oliverturner/rangeslider" {
     handleStyle: { ["left" | "bottom"]: string }
   |};
 
-  declare type Vals = Array<Val>;
+  declare type Vals = Val[];
+
+  declare type Render = (
+    state: State,
+    props: Props,
+    getTrackRef: (el: HTMLElement) => void,
+    listeners: SlideListeners
+  ) => React.Element<*>;
 
   declare type SlideListeners = {
     range: {
@@ -34,34 +41,30 @@ declare module "@oliverturner/rangeslider" {
     disabled?: boolean,
     onChange?: Function,
     onBeforeChange?: Function,
-    onAfterChange?: Function,
-    render: (
-      state: State,
-      props: Props,
-      getTrackRef: (el: HTMLElement) => void,
-      listeners: SlideListeners
-    ) => React.Element<*>
+    onAfterChange?: Function
   };
 
   declare type RawProps = SharedProps & {
-    value: number | Array<number>,
+    value: number | number[],
     min?: number,
     max?: number,
     range?: [number, number],
     minGap?: number,
     step?: number,
-    unit?: number
+    unit?: number,
+    render: Render
   };
 
   declare type Props = SharedProps & {
-    rawValues: Array<number>,
+    rawValues: number[],
     min: number,
     max: number,
     range: [number, number],
     extent: number,
     minGap: number,
     step: number,
-    unit: number
+    unit: number,
+    render: Render
   };
 
   declare type State = {
@@ -69,7 +72,7 @@ declare module "@oliverturner/rangeslider" {
     rangeStyle: {| left: string, width: string |},
     handleIndex: number,
     isDraggingRange: boolean,
-    rangeX: number
+    rangeOffset: number
   };
 
   declare class Rangeslider extends React.Component {
