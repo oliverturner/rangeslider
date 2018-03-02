@@ -162,7 +162,7 @@ class Rangeslider extends React.Component<Props, State> {
       !this.props.rangeDraggable ||
       this.state.values.length === 1;
 
-    if (!undraggable) return;
+    if (!undraggable()) return;
 
     this.bindMouseMove(this.onDragRange);
 
@@ -182,11 +182,12 @@ class Rangeslider extends React.Component<Props, State> {
     const { rangeOffset, values } = this.state;
     const [alpha] = range;
 
+    const [first] = this.topAndTail(this.state.values);
     const newPerc = this.getDeltaX(event.clientX) - rangeOffset;
     const newValue = newPerc * extent + alpha;
     const stepValue = Math.round(newValue / step) * step;
     const value = step > 0 ? stepValue : newValue;
-    const offset = value - values[0].value;
+    const offset = value - first.value;
 
     const newValues = values.map(v => v.value + offset);
 
