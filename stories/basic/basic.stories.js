@@ -6,6 +6,7 @@ import React from "react";
 
 import { storiesOf } from "@storybook/react";
 import { withKnobs } from "@storybook/addon-knobs/react";
+import { action } from '@storybook/addon-actions';
 
 import RangeSlider from "../../src";
 
@@ -76,7 +77,7 @@ const config = {
     minGap: 20
   },
   "Multi handle - min": {
-    value: [50, 100, 150],
+    value: [40, 100, 150],
     range: [0, 200],
     min: 50
   },

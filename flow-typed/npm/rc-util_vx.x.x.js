@@ -13,9 +13,7 @@
  * https://github.com/flowtype/flow-typed
  */
 
-// @flow
-
-declare module "rc-util" {
+declare module 'rc-util' {
   declare module.exports: any;
 }
 
@@ -24,295 +22,284 @@ declare module "rc-util" {
  * require those files directly. Feel free to delete any files that aren't
  * needed.
  */
-declare module "rc-util/es/Children/mapSelf" {
+declare module 'rc-util/es/Children/mapSelf' {
   declare module.exports: any;
 }
 
-declare module "rc-util/es/Children/toArray" {
+declare module 'rc-util/es/Children/toArray' {
   declare module.exports: any;
 }
 
-declare module "rc-util/es/ContainerRender" {
+declare module 'rc-util/es/ContainerRender' {
   declare module.exports: any;
 }
 
-declare module "rc-util/es/createChainedFunction" {
+declare module 'rc-util/es/createChainedFunction' {
   declare module.exports: any;
 }
 
-declare module "rc-util/es/deprecated" {
+declare module 'rc-util/es/deprecated' {
   declare module.exports: any;
 }
 
-declare module "rc-util/es/Dom/addEventListener" {
+declare module 'rc-util/es/Dom/addEventListener' {
   declare module.exports: any;
 }
 
-declare module "rc-util/es/Dom/canUseDom" {
+declare module 'rc-util/es/Dom/canUseDom' {
   declare module.exports: any;
 }
 
-declare module "rc-util/es/Dom/class" {
+declare module 'rc-util/es/Dom/class' {
   declare module.exports: any;
 }
 
-declare module "rc-util/es/Dom/contains" {
+declare module 'rc-util/es/Dom/contains' {
   declare module.exports: any;
 }
 
-declare module "rc-util/es/Dom/css" {
+declare module 'rc-util/es/Dom/css' {
   declare module.exports: any;
 }
 
-declare module "rc-util/es/Dom/focus" {
+declare module 'rc-util/es/Dom/focus' {
   declare module.exports: any;
 }
 
-declare module "rc-util/es/Dom/support" {
+declare module 'rc-util/es/Dom/support' {
   declare module.exports: any;
 }
 
-declare module "rc-util/es/getContainerRenderMixin" {
+declare module 'rc-util/es/getContainerRenderMixin' {
   declare module.exports: any;
 }
 
-declare module "rc-util/es/getScrollBarSize" {
+declare module 'rc-util/es/getScrollBarSize' {
   declare module.exports: any;
 }
 
-declare module "rc-util/es/guid" {
+declare module 'rc-util/es/guid' {
   declare module.exports: any;
 }
 
-declare module "rc-util/es/KeyCode" {
+declare module 'rc-util/es/KeyCode' {
   declare module.exports: any;
 }
 
-declare module "rc-util/es/pickAttrs" {
+declare module 'rc-util/es/pickAttrs' {
   declare module.exports: any;
 }
 
-declare module "rc-util/es/Portal" {
+declare module 'rc-util/es/Portal' {
   declare module.exports: any;
 }
 
-declare module "rc-util/es/PureRenderMixin" {
+declare module 'rc-util/es/PureRenderMixin' {
   declare module.exports: any;
 }
 
-declare module "rc-util/es/warn" {
+declare module 'rc-util/es/warn' {
   declare module.exports: any;
 }
 
-declare module "rc-util/lib/Children/mapSelf" {
+declare module 'rc-util/lib/Children/mapSelf' {
   declare module.exports: any;
 }
 
-declare module "rc-util/lib/Children/toArray" {
+declare module 'rc-util/lib/Children/toArray' {
   declare module.exports: any;
 }
 
-declare module "rc-util/lib/ContainerRender" {
+declare module 'rc-util/lib/ContainerRender' {
   declare module.exports: any;
 }
 
-declare module "rc-util/lib/createChainedFunction" {
+declare module 'rc-util/lib/createChainedFunction' {
   declare module.exports: any;
 }
 
-declare module "rc-util/lib/deprecated" {
+declare module 'rc-util/lib/deprecated' {
   declare module.exports: any;
 }
 
-declare module "rc-util/lib/Dom/addEventListener" {
+declare module 'rc-util/lib/Dom/addEventListener' {
   declare module.exports: any;
 }
 
-declare module "rc-util/lib/Dom/canUseDom" {
+declare module 'rc-util/lib/Dom/canUseDom' {
   declare module.exports: any;
 }
 
-declare module "rc-util/lib/Dom/class" {
+declare module 'rc-util/lib/Dom/class' {
   declare module.exports: any;
 }
 
-declare module "rc-util/lib/Dom/contains" {
+declare module 'rc-util/lib/Dom/contains' {
   declare module.exports: any;
 }
 
-declare module "rc-util/lib/Dom/css" {
+declare module 'rc-util/lib/Dom/css' {
   declare module.exports: any;
 }
 
-declare module "rc-util/lib/Dom/focus" {
+declare module 'rc-util/lib/Dom/focus' {
   declare module.exports: any;
 }
 
-declare module "rc-util/lib/Dom/support" {
+declare module 'rc-util/lib/Dom/support' {
   declare module.exports: any;
 }
 
-declare module "rc-util/lib/getContainerRenderMixin" {
+declare module 'rc-util/lib/getContainerRenderMixin' {
   declare module.exports: any;
 }
 
-declare module "rc-util/lib/getScrollBarSize" {
+declare module 'rc-util/lib/getScrollBarSize' {
   declare module.exports: any;
 }
 
-declare module "rc-util/lib/guid" {
+declare module 'rc-util/lib/guid' {
   declare module.exports: any;
 }
 
-declare module "rc-util/lib/KeyCode" {
-  declare type keyCode = {|
-    UP: string,
-    RIGHT: string,
-    DOWN: string,
-    LEFT: string,
-    END: string,
-    HOME: string,
-    PAGE_UP: string,
-    PAGE_DOWN: string
-  |};
-
-  declare module.exports: keyCode;
-}
-
-declare module "rc-util/lib/pickAttrs" {
+declare module 'rc-util/lib/KeyCode' {
   declare module.exports: any;
 }
 
-declare module "rc-util/lib/Portal" {
+declare module 'rc-util/lib/pickAttrs' {
   declare module.exports: any;
 }
 
-declare module "rc-util/lib/PureRenderMixin" {
+declare module 'rc-util/lib/Portal' {
   declare module.exports: any;
 }
 
-declare module "rc-util/lib/warn" {
+declare module 'rc-util/lib/PureRenderMixin' {
+  declare module.exports: any;
+}
+
+declare module 'rc-util/lib/warn' {
   declare module.exports: any;
 }
 
 // Filename aliases
-declare module "rc-util/es/Children/mapSelf.js" {
-  declare module.exports: $Exports<"rc-util/es/Children/mapSelf">;
+declare module 'rc-util/es/Children/mapSelf.js' {
+  declare module.exports: $Exports<'rc-util/es/Children/mapSelf'>;
 }
-declare module "rc-util/es/Children/toArray.js" {
-  declare module.exports: $Exports<"rc-util/es/Children/toArray">;
+declare module 'rc-util/es/Children/toArray.js' {
+  declare module.exports: $Exports<'rc-util/es/Children/toArray'>;
 }
-declare module "rc-util/es/ContainerRender.js" {
-  declare module.exports: $Exports<"rc-util/es/ContainerRender">;
+declare module 'rc-util/es/ContainerRender.js' {
+  declare module.exports: $Exports<'rc-util/es/ContainerRender'>;
 }
-declare module "rc-util/es/createChainedFunction.js" {
-  declare module.exports: $Exports<"rc-util/es/createChainedFunction">;
+declare module 'rc-util/es/createChainedFunction.js' {
+  declare module.exports: $Exports<'rc-util/es/createChainedFunction'>;
 }
-declare module "rc-util/es/deprecated.js" {
-  declare module.exports: $Exports<"rc-util/es/deprecated">;
+declare module 'rc-util/es/deprecated.js' {
+  declare module.exports: $Exports<'rc-util/es/deprecated'>;
 }
-declare module "rc-util/es/Dom/addEventListener.js" {
-  declare module.exports: $Exports<"rc-util/es/Dom/addEventListener">;
+declare module 'rc-util/es/Dom/addEventListener.js' {
+  declare module.exports: $Exports<'rc-util/es/Dom/addEventListener'>;
 }
-declare module "rc-util/es/Dom/canUseDom.js" {
-  declare module.exports: $Exports<"rc-util/es/Dom/canUseDom">;
+declare module 'rc-util/es/Dom/canUseDom.js' {
+  declare module.exports: $Exports<'rc-util/es/Dom/canUseDom'>;
 }
-declare module "rc-util/es/Dom/class.js" {
-  declare module.exports: $Exports<"rc-util/es/Dom/class">;
+declare module 'rc-util/es/Dom/class.js' {
+  declare module.exports: $Exports<'rc-util/es/Dom/class'>;
 }
-declare module "rc-util/es/Dom/contains.js" {
-  declare module.exports: $Exports<"rc-util/es/Dom/contains">;
+declare module 'rc-util/es/Dom/contains.js' {
+  declare module.exports: $Exports<'rc-util/es/Dom/contains'>;
 }
-declare module "rc-util/es/Dom/css.js" {
-  declare module.exports: $Exports<"rc-util/es/Dom/css">;
+declare module 'rc-util/es/Dom/css.js' {
+  declare module.exports: $Exports<'rc-util/es/Dom/css'>;
 }
-declare module "rc-util/es/Dom/focus.js" {
-  declare module.exports: $Exports<"rc-util/es/Dom/focus">;
+declare module 'rc-util/es/Dom/focus.js' {
+  declare module.exports: $Exports<'rc-util/es/Dom/focus'>;
 }
-declare module "rc-util/es/Dom/support.js" {
-  declare module.exports: $Exports<"rc-util/es/Dom/support">;
+declare module 'rc-util/es/Dom/support.js' {
+  declare module.exports: $Exports<'rc-util/es/Dom/support'>;
 }
-declare module "rc-util/es/getContainerRenderMixin.js" {
-  declare module.exports: $Exports<"rc-util/es/getContainerRenderMixin">;
+declare module 'rc-util/es/getContainerRenderMixin.js' {
+  declare module.exports: $Exports<'rc-util/es/getContainerRenderMixin'>;
 }
-declare module "rc-util/es/getScrollBarSize.js" {
-  declare module.exports: $Exports<"rc-util/es/getScrollBarSize">;
+declare module 'rc-util/es/getScrollBarSize.js' {
+  declare module.exports: $Exports<'rc-util/es/getScrollBarSize'>;
 }
-declare module "rc-util/es/guid.js" {
-  declare module.exports: $Exports<"rc-util/es/guid">;
+declare module 'rc-util/es/guid.js' {
+  declare module.exports: $Exports<'rc-util/es/guid'>;
 }
-declare module "rc-util/es/KeyCode.js" {
-  declare module.exports: $Exports<"rc-util/es/KeyCode">;
+declare module 'rc-util/es/KeyCode.js' {
+  declare module.exports: $Exports<'rc-util/es/KeyCode'>;
 }
-declare module "rc-util/es/pickAttrs.js" {
-  declare module.exports: $Exports<"rc-util/es/pickAttrs">;
+declare module 'rc-util/es/pickAttrs.js' {
+  declare module.exports: $Exports<'rc-util/es/pickAttrs'>;
 }
-declare module "rc-util/es/Portal.js" {
-  declare module.exports: $Exports<"rc-util/es/Portal">;
+declare module 'rc-util/es/Portal.js' {
+  declare module.exports: $Exports<'rc-util/es/Portal'>;
 }
-declare module "rc-util/es/PureRenderMixin.js" {
-  declare module.exports: $Exports<"rc-util/es/PureRenderMixin">;
+declare module 'rc-util/es/PureRenderMixin.js' {
+  declare module.exports: $Exports<'rc-util/es/PureRenderMixin'>;
 }
-declare module "rc-util/es/warn.js" {
-  declare module.exports: $Exports<"rc-util/es/warn">;
+declare module 'rc-util/es/warn.js' {
+  declare module.exports: $Exports<'rc-util/es/warn'>;
 }
-declare module "rc-util/lib/Children/mapSelf.js" {
-  declare module.exports: $Exports<"rc-util/lib/Children/mapSelf">;
+declare module 'rc-util/lib/Children/mapSelf.js' {
+  declare module.exports: $Exports<'rc-util/lib/Children/mapSelf'>;
 }
-declare module "rc-util/lib/Children/toArray.js" {
-  declare module.exports: $Exports<"rc-util/lib/Children/toArray">;
+declare module 'rc-util/lib/Children/toArray.js' {
+  declare module.exports: $Exports<'rc-util/lib/Children/toArray'>;
 }
-declare module "rc-util/lib/ContainerRender.js" {
-  declare module.exports: $Exports<"rc-util/lib/ContainerRender">;
+declare module 'rc-util/lib/ContainerRender.js' {
+  declare module.exports: $Exports<'rc-util/lib/ContainerRender'>;
 }
-declare module "rc-util/lib/createChainedFunction.js" {
-  declare module.exports: $Exports<"rc-util/lib/createChainedFunction">;
+declare module 'rc-util/lib/createChainedFunction.js' {
+  declare module.exports: $Exports<'rc-util/lib/createChainedFunction'>;
 }
-declare module "rc-util/lib/deprecated.js" {
-  declare module.exports: $Exports<"rc-util/lib/deprecated">;
+declare module 'rc-util/lib/deprecated.js' {
+  declare module.exports: $Exports<'rc-util/lib/deprecated'>;
 }
-declare module "rc-util/lib/Dom/addEventListener.js" {
-  declare module.exports: $Exports<"rc-util/lib/Dom/addEventListener">;
+declare module 'rc-util/lib/Dom/addEventListener.js' {
+  declare module.exports: $Exports<'rc-util/lib/Dom/addEventListener'>;
 }
-declare module "rc-util/lib/Dom/canUseDom.js" {
-  declare module.exports: $Exports<"rc-util/lib/Dom/canUseDom">;
+declare module 'rc-util/lib/Dom/canUseDom.js' {
+  declare module.exports: $Exports<'rc-util/lib/Dom/canUseDom'>;
 }
-declare module "rc-util/lib/Dom/class.js" {
-  declare module.exports: $Exports<"rc-util/lib/Dom/class">;
+declare module 'rc-util/lib/Dom/class.js' {
+  declare module.exports: $Exports<'rc-util/lib/Dom/class'>;
 }
-declare module "rc-util/lib/Dom/contains.js" {
-  declare module.exports: $Exports<"rc-util/lib/Dom/contains">;
+declare module 'rc-util/lib/Dom/contains.js' {
+  declare module.exports: $Exports<'rc-util/lib/Dom/contains'>;
 }
-declare module "rc-util/lib/Dom/css.js" {
-  declare module.exports: $Exports<"rc-util/lib/Dom/css">;
+declare module 'rc-util/lib/Dom/css.js' {
+  declare module.exports: $Exports<'rc-util/lib/Dom/css'>;
 }
-declare module "rc-util/lib/Dom/focus.js" {
-  declare module.exports: $Exports<"rc-util/lib/Dom/focus">;
+declare module 'rc-util/lib/Dom/focus.js' {
+  declare module.exports: $Exports<'rc-util/lib/Dom/focus'>;
 }
-declare module "rc-util/lib/Dom/support.js" {
-  declare module.exports: $Exports<"rc-util/lib/Dom/support">;
+declare module 'rc-util/lib/Dom/support.js' {
+  declare module.exports: $Exports<'rc-util/lib/Dom/support'>;
 }
-declare module "rc-util/lib/getContainerRenderMixin.js" {
-  declare module.exports: $Exports<"rc-util/lib/getContainerRenderMixin">;
+declare module 'rc-util/lib/getContainerRenderMixin.js' {
+  declare module.exports: $Exports<'rc-util/lib/getContainerRenderMixin'>;
 }
-declare module "rc-util/lib/getScrollBarSize.js" {
-  declare module.exports: $Exports<"rc-util/lib/getScrollBarSize">;
+declare module 'rc-util/lib/getScrollBarSize.js' {
+  declare module.exports: $Exports<'rc-util/lib/getScrollBarSize'>;
 }
-declare module "rc-util/lib/guid.js" {
-  declare module.exports: $Exports<"rc-util/lib/guid">;
+declare module 'rc-util/lib/guid.js' {
+  declare module.exports: $Exports<'rc-util/lib/guid'>;
 }
-declare module "rc-util/lib/KeyCode.js" {
-  declare module.exports: $Exports<"rc-util/lib/KeyCode">;
+declare module 'rc-util/lib/KeyCode.js' {
+  declare module.exports: $Exports<'rc-util/lib/KeyCode'>;
 }
-declare module "rc-util/lib/pickAttrs.js" {
-  declare module.exports: $Exports<"rc-util/lib/pickAttrs">;
+declare module 'rc-util/lib/pickAttrs.js' {
+  declare module.exports: $Exports<'rc-util/lib/pickAttrs'>;
 }
-declare module "rc-util/lib/Portal.js" {
-  declare module.exports: $Exports<"rc-util/lib/Portal">;
+declare module 'rc-util/lib/Portal.js' {
+  declare module.exports: $Exports<'rc-util/lib/Portal'>;
 }
-declare module "rc-util/lib/PureRenderMixin.js" {
-  declare module.exports: $Exports<"rc-util/lib/PureRenderMixin">;
+declare module 'rc-util/lib/PureRenderMixin.js' {
+  declare module.exports: $Exports<'rc-util/lib/PureRenderMixin'>;
 }
-declare module "rc-util/lib/warn.js" {
-  declare module.exports: $Exports<"rc-util/lib/warn">;
+declare module 'rc-util/lib/warn.js' {
+  declare module.exports: $Exports<'rc-util/lib/warn'>;
 }

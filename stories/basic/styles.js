@@ -27,18 +27,6 @@ export const Slider = styled.div`
         cursor: not-allowed;
       }
     `};
-
-  ${props =>
-    props.step &&
-    css`
-      & ${Handle} {
-        transition: 0.1s left;
-      }
-
-      & ${Range} {
-        transition: 0.1s width;
-      }
-    `};
 `;
 
 export const Track = styled.div`

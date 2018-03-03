@@ -1,6 +1,6 @@
 // @flow
 
-import type { Props } from "@oliverturner/rangeslider";
+import type { Props, Val } from "@oliverturner/rangeslider";
 
 import keyCode from "rc-util/lib/KeyCode";
 
@@ -31,46 +31,15 @@ export function keypressActions(event: SyntheticKeyboardEvent<*>) {
   }
 }
 
-export const optimizedResize = (eventName: string) => {
-  const callbacks = [];
-  let running = false;
+export function fmtPercent(v: number) {
+  return (v * 100).toFixed(1) + "%";
+}
 
-  // fired on resize event
-  function onEvent() {
-    if (!running) {
-      running = true;
+export function topAndTail(values: Val[]): [Val, Val] {
+  const arr = values.slice().sort((a, b) => a.value - b.value);
+  return [arr[0], arr[arr.length - 1]];
+}
 
-      if (window.requestAnimationFrame) {
-        window.requestAnimationFrame(runCallbacks);
-      } else {
-        setTimeout(runCallbacks, 66);
-      }
-    }
-  }
-
-  // run the actual callbacks
-  function runCallbacks() {
-    callbacks.forEach(function(callback) {
-      callback();
-    });
-
-    running = false;
-  }
-
-  // adds callback to loop
-  function addCallback(callback) {
-    if (callback) {
-      callbacks.push(callback);
-    }
-  }
-
-  return {
-    // public method to add additional callback
-    add: function(callback: Function) {
-      if (!callbacks.length) {
-        window.addEventListener(eventName, onEvent);
-      }
-      addCallback(callback);
-    }
-  };
-};
+export function valueAtPosition(delta: number, extent: number, alpha: number) {
+  return delta * extent + alpha;
+}

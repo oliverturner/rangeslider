@@ -76,6 +76,10 @@ declare module "@oliverturner/rangeslider" {
   };
 
   declare class Rangeslider extends React.Component {
+    trackEl: ?HTMLElement;
+    clientWidth: number;
+    clientRect: { ["left" | "bottom"]: number };
+    
     constructor(props: Props): void;
   }
 }
