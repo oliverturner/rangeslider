@@ -6,8 +6,18 @@ import debounce from "frame-debounce";
 
 import * as utils from "./utils";
 
-export class UI {
+declare class RangesliderUI {
+  trackEl: ?HTMLElement;
+  deltaKey: "clientX" | "clientY";
+  clientWidth: number;
+  clientRect: { ["left" | "bottom"]: number };
+
+  constructor(props: Props): void;
+}
+
+class UI {
   trackEl = null;
+  deltaKey = "clientX";
   clientWidth = 0;
   clientRect = { left: 0 };
   handleStyle = { xProp: "left" };
@@ -20,10 +30,19 @@ export class UI {
     }
   }
 
-  initialise(){
+  initialise() {
     const cb = debounce(this.calcBounds, 200);
     document.addEventListener("resize", cb);
   }
+
+  calcBounds() {
+    if (this.trackEl) {
+      this.clientWidth = this.trackEl.clientWidth;
+      this.clientRect = this.trackEl.getBoundingClientRect();
+    }
+  }
+
+  getDeltaX = (x: number) => (x - this.clientRect.left) / this.clientWidth;
 
   getHandleStyle = (percent: string) => {
     return { [this.handleStyle.xProp]: percent };
@@ -43,4 +62,13 @@ export class UI {
       [dProp]: utils.fmtPercent(vMax.delta - vMin.delta)
     };
   };
+
+  getTrackRef = (el: HTMLElement) => {
+    if (el) {
+      this.trackEl = el;
+      this.calcBounds();
+    }
+  };
 }
+
+export default UI;

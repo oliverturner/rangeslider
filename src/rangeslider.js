@@ -5,6 +5,7 @@ import type { Val, State, Props } from "@oliverturner/rangeslider";
 import * as React from "react";
 import debounce from "frame-debounce";
 
+import UI from "./ui"
 import * as utils from "./utils";
 
 class Rangeslider extends React.Component<Props, State> {
@@ -30,6 +31,8 @@ class Rangeslider extends React.Component<Props, State> {
       isDraggingRange: false,
       rangeOffset: 0
     };
+
+    this.ui = new UI(props)
   }
 
   componentDidMount() {
