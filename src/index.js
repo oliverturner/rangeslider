@@ -7,21 +7,21 @@ import * as React from "react";
 import Rangeslider from "./rangeslider";
 
 const Wrapper = (props: RawProps) => {
-  let { value, min, max, range, step } = props;
+  let { value, min, max, bounds, step } = props;
 
-  const rawValues = Array.isArray(value) ? value : [value];
+  const rawValues = Array.isArray(value) ? value.map(v => +v) : [value];
 
   if (typeof min === "undefined") {
-    min = (range && range[0]) || 0;
+    min = (bounds && bounds[0]) || 0;
   }
   if (typeof max === "undefined") {
-    max = (range && range[1]) || 0;
+    max = (bounds && bounds[1]) || 0;
   }
-  if (typeof range === "undefined") {
-    range = [min, max];
+  if (typeof bounds === "undefined") {
+    bounds = [min, max];
   }
 
-  const extent = range[1] - range[0];
+  const extent = bounds[1] - bounds[0];
   const unit = step || extent / 20;
 
   const derivedProps: Props = {
@@ -29,7 +29,7 @@ const Wrapper = (props: RawProps) => {
     rawValues,
     min,
     max,
-    range,
+    bounds,
     extent,
     unit
   };

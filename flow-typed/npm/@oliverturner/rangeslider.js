@@ -35,54 +35,58 @@ declare module "@oliverturner/rangeslider" {
 
   declare type SharedProps = {
     children?: React.Element<*>,
-    rangeDraggable?: boolean,
+    rangeLocked?: boolean,
     orderLocked?: boolean,
     vertical?: boolean,
     disabled?: boolean,
     onChange?: Function,
     onBeforeChange?: Function,
-    onAfterChange?: Function
+    onAfterChange?: Function,
+    render: Render
   };
 
   declare type RawProps = SharedProps & {
     value: number | number[],
     min?: number,
     max?: number,
-    range?: [number, number],
+    bounds?: [number, number],
     minGap?: number,
     step?: number,
-    unit?: number,
-    render: Render
+    unit?: number
   };
 
   declare type Props = SharedProps & {
     rawValues: number[],
     min: number,
     max: number,
-    range: [number, number],
+    bounds: [number, number],
     extent: number,
     minGap: number,
     step: number,
-    unit: number,
-    render: Render
+    unit: number
   };
 
   declare type State = {
     values: Vals,
     rangeStyle: {| left: string, width: string |},
-    handleIndex: number,
+    dragHandleIndex: number,
     isDraggingRange: boolean,
     rangeOffset: number
   };
 
   declare class Rangeslider extends React.Component {
-    ui: UI,
-    trackEl: ?HTMLElement;
-    clientWidth: number;
-    clientRect: { ["left" | "bottom"]: number };
-    
+    ui: RangesliderUI;
+    keyUpHandler: Function;
+
     constructor(props: Props): void;
   }
 
-  declare class UI {}
+  declare class RangesliderUI {
+    trackEl: ?HTMLElement;
+    deltaKey: "clientX" | "clientY";
+    clientWidth: number;
+    clientRect: DOMRect;
+
+    constructor(props: Props): void;
+  }
 }

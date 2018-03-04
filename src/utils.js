@@ -2,29 +2,29 @@
 
 import type { Props, Val } from "@oliverturner/rangeslider";
 
-import keyCode from "rc-util/lib/KeyCode";
+import keyCodes from "rc-util/lib/KeyCode";
 
-export function keypressActions(event: SyntheticKeyboardEvent<*>) {
-  switch (event.keyCode) {
-    case keyCode.UP:
-    case keyCode.RIGHT:
-      return (value: number, props: Props) => value + props.step;
+export function keypressActions(keyCode: number) {
+  switch (keyCode) {
+    case keyCodes.UP:
+    case keyCodes.RIGHT:
+      return (v: number, props: Props) => v + props.unit;
 
-    case keyCode.DOWN:
-    case keyCode.LEFT:
-      return (value: number, props: Props) => value - props.step;
+    case keyCodes.DOWN:
+    case keyCodes.LEFT:
+      return (v: number, props: Props) => v - props.unit;
 
-    case keyCode.END:
-      return (value: number, props: Props) => props.max;
+    case keyCodes.END:
+      return (v: number, props: Props) => props.max;
 
-    case keyCode.HOME:
-      return (value: number, props: Props) => props.min;
+    case keyCodes.HOME:
+      return (v: number, props: Props) => props.min;
 
-    case keyCode.PAGE_UP:
-      return (value: number, props: Props) => value + props.step * 2;
+    case keyCodes.PAGE_UP:
+      return (v: number, props: Props) => v + props.unit * 2;
 
-    case keyCode.PAGE_DOWN:
-      return (value: number, props: Props) => value - props.step * 2;
+    case keyCodes.PAGE_DOWN:
+      return (v: number, props: Props) => v - props.unit * 2;
 
     default:
       return undefined;

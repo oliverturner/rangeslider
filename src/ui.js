@@ -6,36 +6,32 @@ import debounce from "frame-debounce";
 
 import * as utils from "./utils";
 
-declare class RangesliderUI {
-  trackEl: ?HTMLElement;
-  deltaKey: "clientX" | "clientY";
-  clientWidth: number;
-  clientRect: { ["left" | "bottom"]: number };
-
-  constructor(props: Props): void;
-}
-
-class UI {
+class RangesliderUI {
   trackEl = null;
   deltaKey = "clientX";
   clientWidth = 0;
-  clientRect = { left: 0 };
-  handleStyle = { xProp: "left" };
-  rangeStyle = { xProp: "left", dProp: "width" };
+  clientRect = { left: 0, top: 0 };
+  xProp = "left";
+  dProp = "width";
+  handleStyle = {};
+  rangeStyle = {};
 
   constructor(props: Props) {
     if (props.vertical) {
-      this.handleStyle.xProp = "bottom";
-      this.rangeStyle = { xProp: "bottom", dProp: "height" };
+      this.xProp = "bottom";
+      this.dProp = "height";
     }
+
+    this.handleStyle.xProp = this.xProp;
+    this.rangeStyle = { xProp: this.xProp, dProp: this.dProp };
   }
 
   initialise() {
     const cb = debounce(this.calcBounds, 200);
-    document.addEventListener("resize", cb);
+    window.addEventListener("resize", cb);
   }
 
-  calcBounds() {
+  calcBounds = () => {
     if (this.trackEl) {
       this.clientWidth = this.trackEl.clientWidth;
       this.clientRect = this.trackEl.getBoundingClientRect();
@@ -71,4 +67,4 @@ class UI {
   };
 }
 
-export default UI;
+export default RangesliderUI;

@@ -1,18 +1,22 @@
 // @flow
 
-import type { RawProps } from "@oliverturner/rangeslider";
+import type { Render, RawProps } from "@oliverturner/rangeslider";
 
 import * as React from "react";
 import { object, number, boolean } from "@storybook/addon-knobs/react";
 
-export function getControls(props: RawProps) {
+type Props = RawProps & {
+  render?: Render
+};
+
+export function getControls(props: Props) {
   const {
     value,
-    range,
+    bounds,
     min,
     max,
     step,
-    rangeDraggable,
+    rangeLocked,
     orderLocked,
     minGap,
     disabled
@@ -23,13 +27,12 @@ export function getControls(props: RawProps) {
     value: Array.isArray(value)
       ? object("value", value)
       : number("value", value),
-    range: range && object("range", range),
+    bounds: bounds && object("bounds", bounds),
     min: min && number("min", min),
     max: max && number("max", max),
     step: step && number("step", step),
-    rangeDraggable:
-      typeof rangeDraggable !== "undefined" &&
-      boolean("rangeDraggable", rangeDraggable),
+    rangeLocked:
+      typeof rangeLocked !== "undefined" && boolean("rangeLocked", rangeLocked),
     orderLocked:
       typeof orderLocked !== "undefined" && boolean("orderLocked", orderLocked),
     minGap: minGap && number("minGap", minGap),
@@ -38,29 +41,29 @@ export function getControls(props: RawProps) {
 }
 
 type Scale = {
-  min: number,
-  max: number,
-  range: [number, number],
-  step: number
+  min?: number,
+  max?: number,
+  bounds?: [number, number],
+  step?: number
 };
-export function getScale({ min, max, range, step }: Scale) {
+export function getScale({ min, max, bounds, step = -1 }: Scale) {
   if (typeof min === "undefined") {
-    min = (range && range[0]) || 0;
+    min = (bounds && bounds[0]) || 0;
   }
   if (typeof max === "undefined") {
-    max = (range && range[1]) || 0;
+    max = (bounds && bounds[1]) || 0;
   }
-  if (typeof range === "undefined") {
-    range = [min, max];
+  if (typeof bounds === "undefined") {
+    bounds = [min, max];
   }
-  if (typeof step === "undefined") {
+  if (step < 0) {
     step = max / 10;
   }
 
   let steps = 0;
   let ticks = [];
 
-  const [a, z] = range;
+  const [a, z] = bounds;
   steps = (z - a) / step;
   ticks = Array.from({ length: steps }, (_, i) => {
     const n = a + (i + 1) * step;

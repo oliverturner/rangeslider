@@ -4,40 +4,32 @@ import type { Val, State, Props } from "@oliverturner/rangeslider";
 
 import * as React from "react";
 import debounce from "frame-debounce";
+import keyCode from "rc-util/lib/KeyCode";
 
-import UI from "./ui"
+import UI from "./ui";
 import * as utils from "./utils";
 
 class Rangeslider extends React.Component<Props, State> {
   static defaultProps: Props;
 
-  trackEl = null;
-  clientWidth = 0;
-  clientRect = { left: 0 };
-  handleStyle = { xProp: "left" };
-  rangeStyle = { xProp: "left", dProp: "width" };
+  ui = {};
+  keyUpHandler = null;
 
   constructor(props: Props) {
     super();
 
-    if (props.vertical) {
-      this.handleStyle.xProp = "bottom";
-      this.rangeStyle = { xProp: "bottom", dProp: "height" };
-    }
+    this.ui = new UI(props);
 
     this.state = {
       ...this.getValues(props, props.rawValues),
-      handleIndex: -1,
+      dragHandleIndex: -1,
       isDraggingRange: false,
       rangeOffset: 0
     };
-
-    this.ui = new UI(props)
   }
 
   componentDidMount() {
-    const cb = debounce(this.calcBounds, 200);
-    document.addEventListener("resize", cb);
+    this.ui.initialise();
   }
 
   componentWillReceiveProps(newProps: Props) {
@@ -51,40 +43,7 @@ class Rangeslider extends React.Component<Props, State> {
     }
   }
 
-  calcBounds() {
-    if (this.trackEl) {
-      this.clientWidth = this.trackEl.clientWidth;
-      this.clientRect = this.trackEl.getBoundingClientRect();
-    }
-  }
-
-  getTrackRef = (el: HTMLElement) => {
-    if (el) {
-      this.trackEl = el;
-      this.calcBounds();
-    }
-  };
-
-  getHandleStyle = (percent: string) => {
-    return { [this.handleStyle.xProp]: percent };
-  };
-
-  getRangeStyle = (values: Val[]) => {
-    const { xProp, dProp } = this.rangeStyle;
-
-    if (values.length === 1) {
-      return { [xProp]: "0", [dProp]: values[0].percent };
-    }
-
-    const [vMin, vMax] = utils.topAndTail(values);
-
-    return {
-      [xProp]: vMin.percent,
-      [dProp]: utils.fmtPercent(vMax.delta - vMin.delta)
-    };
-  };
-
-  updateValue = ({ min, max, range, extent, step }: Props) => (
+  updateValue = ({ min, max, bounds, extent, step }: Props) => (
     value: number
   ) => {
     value = value > max ? max : value;
@@ -94,9 +53,9 @@ class Rangeslider extends React.Component<Props, State> {
       value = Math.round(value / step) * step;
     }
 
-    const delta = (value - range[0]) / extent;
+    const delta = (value - bounds[0]) / extent;
     const percent = utils.fmtPercent(delta);
-    const handleStyle = this.getHandleStyle(percent);
+    const handleStyle = this.ui.getHandleStyle(percent);
 
     return { value, delta, percent, handleStyle };
   };
@@ -105,7 +64,7 @@ class Rangeslider extends React.Component<Props, State> {
     const { onChange } = props;
     const mapFn = this.updateValue(props);
     const values = rawValues.map(mapFn);
-    const rangeStyle = this.getRangeStyle(values);
+    const rangeStyle = this.ui.getRangeStyle(values);
 
     // Notify subcribers of updated values
     if (onChange) {
@@ -140,7 +99,11 @@ class Rangeslider extends React.Component<Props, State> {
   //----------------------------------------------------------------------------
   // Handle mouse events
   //----------------------------------------------------------------------------
-  getDeltaX = (x: number) => (x - this.clientRect.left) / this.clientWidth;
+  bindMouseMove(moveFn: Function) {
+    const cb = debounce(moveFn, 200);
+    document.addEventListener("mousemove", cb);
+    document.addEventListener("mouseup", this.unbindMouseMove(cb));
+  }
 
   unbindMouseMove = (cb: Function) => () => {
     document.removeEventListener("mousemove", cb);
@@ -148,30 +111,24 @@ class Rangeslider extends React.Component<Props, State> {
 
     this.setState({
       isDraggingRange: false,
-      handleIndex: -1
+      dragHandleIndex: -1
     });
   };
-
-  bindMouseMove(moveFn: Function) {
-    const cb = debounce(moveFn, 200);
-    document.addEventListener("mousemove", cb);
-    document.addEventListener("mouseup", this.unbindMouseMove(cb));
-  }
 
   // Range mouse listeners
   //----------------------------------------------------------------------------
   onRangePress = (event: SyntheticMouseEvent<HTMLElement>) => {
     const undraggable = () =>
       this.props.disabled ||
-      !this.props.rangeDraggable ||
+      this.props.rangeLocked ||
       this.state.values.length === 1;
 
-    if (!undraggable()) return;
+    if (undraggable()) return;
 
     this.bindMouseMove(this.onDragRange);
 
     const [first] = utils.topAndTail(this.state.values);
-    const rangeX = this.getDeltaX(event.clientX);
+    const rangeX = this.ui.getDeltaX(event.clientX);
 
     this.setState({
       isDraggingRange: true,
@@ -182,15 +139,14 @@ class Rangeslider extends React.Component<Props, State> {
   onDragRange = (event: SyntheticMouseEvent<HTMLElement>) => {
     if (!this.state.isDraggingRange) return;
 
-    const { range, extent, step, min, max } = this.props;
+    const { bounds, extent, step, min, max } = this.props;
     const { rangeOffset, values } = this.state;
-    const [alpha] = range;
 
     const getStepValue = v => Math.round(v / step) * step;
 
     const [first] = utils.topAndTail(this.state.values);
-    const newDelta = this.getDeltaX(event.clientX) - rangeOffset;
-    const newValue = utils.valueAtPosition(newDelta, extent, alpha);
+    const newDelta = this.ui.getDeltaX(event.clientX) - rangeOffset;
+    const newValue = utils.valueAtPosition(newDelta, extent, bounds[0]);
     const value = step > 0 ? getStepValue(newValue) : newValue;
     const offset = value - first.value;
     const newValues = values.map(v => v.value + offset);
@@ -211,30 +167,46 @@ class Rangeslider extends React.Component<Props, State> {
   //----------------------------------------------------------------------------
   // When tabbing to a handle bind keyboard listeners
   onHandleFocus = (index: number) => () => {
-    console.log("onHandleFocus", index);
+    this.keyUpHandler = this.onKeyUp(index);
+    document.addEventListener("keyup", this.keyUpHandler);
   };
 
-  onHandleBlur = (index: number) => () => {
-    console.log("onHandleBlur", index);
+  onHandleBlur = () => () => {
+    document.removeEventListener("keyup", this.keyUpHandler);
+  };
+
+  onKeyUp = (index: number) => (event: SyntheticKeyboardEvent<*>) => {
+    event.preventDefault();
+
+    const { values } = this.state;
+    const fn = utils.keypressActions(event.keyCode);
+
+    if (fn) {
+      const newValue = fn(values[index].value, this.props);
+      this.updateHandleValue(index, values, newValue);
+    }
   };
 
   onHandlePress = (index: number) => () => {
     if (this.props.disabled) return;
 
-    this.setState({ handleIndex: index });
+    this.setState({ dragHandleIndex: index });
     this.bindMouseMove(this.onDragHandle);
   };
 
   onDragHandle = (event: SyntheticMouseEvent<HTMLElement>) => {
-    if (this.state.handleIndex < 0) return;
+    if (this.state.dragHandleIndex < 0) return;
 
-    const { range, extent } = this.props;
-    const [alpha] = range;
-    const { handleIndex, values } = this.state;
+    const { bounds, extent } = this.props;
+    const { dragHandleIndex, values } = this.state;
 
-    const newDelta = this.getDeltaX(event.clientX);
-    const newValue = utils.valueAtPosition(newDelta, extent, alpha);
+    const newDelta = this.ui.getDeltaX(event.clientX);
+    const newValue = utils.valueAtPosition(newDelta, extent, bounds[0]);
 
+    this.updateHandleValue(dragHandleIndex, values, newValue);
+  };
+
+  updateHandleValue(handleIndex: number, values: Val[], newValue) {
     if (values.length === 1) {
       this.setState(this.getValues(this.props, [newValue]));
     } else {
@@ -245,7 +217,7 @@ class Rangeslider extends React.Component<Props, State> {
         )
       );
     }
-  };
+  }
 
   onClickTrack = () => {
     console.log("onClickTrack called");
@@ -263,7 +235,7 @@ class Rangeslider extends React.Component<Props, State> {
       handle: (index: number) => ({
         onMouseDown: this.onHandlePress(index),
         onFocus: this.onHandleFocus(index),
-        onBlur: this.onHandleBlur(index)
+        onBlur: this.onHandleBlur()
       }),
       track: {
         onClick: this.onClickTrack
@@ -273,7 +245,7 @@ class Rangeslider extends React.Component<Props, State> {
     return this.props.render(
       this.state,
       this.props,
-      this.getTrackRef,
+      this.ui.getTrackRef,
       listeners
     );
   }
@@ -284,14 +256,14 @@ Rangeslider.defaultProps = {
   min: 0,
   max: 100,
   step: 0,
-  range: [0, 0],
+  bounds: [0, 0],
   extent: 0,
   unit: 0,
   vertical: false,
   disabled: false,
   orderLocked: false,
   minGap: 0,
-  rangeDraggable: true,
+  rangeLocked: false,
   render: () => {},
   children: null
 };
